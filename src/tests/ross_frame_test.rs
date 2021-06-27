@@ -1,23 +1,31 @@
-use bxcan::{Frame, Id, ExtendedId};
+use bxcan::{Frame, ExtendedId};
 
 use crate::{RossFrameId, RossFrame};
 
-const BXCAN_EXTENDED_IDENTIFIER: Id =
-    Id::Extended(unsafe { ExtendedId::new_unchecked(0x0aaaaaaa) });
-
-const BXCAN_DATA: [u8; 8] = [0xaa; 8];
+const FRAME_ID: u32 = 0x15555555;
+const FRAME_DATA: [u8; 8] = [0x55; 8];
+const ROSS_FRAME: RossFrame = RossFrame {
+    not_error_flag: true,
+    start_frame_flag: false,
+    multi_frame_flag: true,
+    frame_id: RossFrameId::CurrentFrameId(0x0555),
+    device_address: 0x5555,
+    data_len: 8,
+    data: FRAME_DATA,
+};
 
 #[test]
 fn from_bxcan_frame_test() {
-    let bxcan_frame = Frame::new_data(BXCAN_EXTENDED_IDENTIFIER, BXCAN_DATA);
+    let bxcan_frame = Frame::new_data(ExtendedId::new(FRAME_ID).unwrap(), FRAME_DATA);
+    let ross_frame = RossFrame::from_bxcan_frame(bxcan_frame).unwrap();
 
-    let frame = RossFrame::from_bxcan_frame(bxcan_frame).unwrap();
+    assert_eq!(ross_frame, ROSS_FRAME);
+}
 
-    assert_eq!(frame.not_error_flag, true);
-    assert_eq!(frame.start_frame_flag, false);
-    assert_eq!(frame.multi_frame_flag, true);
-    assert_eq!(frame.frame_id, RossFrameId::CurrentFrameId(0x0aaa));
-    assert_eq!(frame.device_address, 0xaaaa);
-    assert_eq!(frame.data_len, 8);
-    assert_eq!(frame.data, BXCAN_DATA);
+#[test]
+fn to_bxcan_frame_test() {
+    let bxcan_frame = ROSS_FRAME.to_bxcan_frame();
+    let bxcan_frame_expected = Frame::new_data(ExtendedId::new(FRAME_ID).unwrap(), FRAME_DATA);
+
+    assert_eq!(bxcan_frame, bxcan_frame_expected);
 }

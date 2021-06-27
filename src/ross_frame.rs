@@ -1,5 +1,4 @@
-use bxcan::Frame;
-use bxcan::Id;
+use bxcan::{Frame, Id, ExtendedId, Data};
 
 /// Frame id for packets with more than one frame
 #[derive(Debug, PartialEq)]
@@ -21,6 +20,7 @@ pub enum RossFrameError {
 }
 
 /// Ross compatible representation of a CAN frame
+#[derive(Debug, PartialEq)]
 pub struct RossFrame {
     /// If this bit is low, the frame is considered to be an error frame
     pub not_error_flag: bool,
@@ -54,11 +54,13 @@ impl RossFrame {
         if let Id::Extended(id) = frame.id() {
             let id = id.as_raw();
 
-            let not_error_flag = ((id >> 27) & 0x0001) > 0;
-            let start_frame_flag = ((id >> 26) & 0x0001) > 0;
-            let multi_frame_flag = ((id >> 25) & 0x0001) > 0;
+            let not_error_flag = ((id >> 28) & 0x0001) != 0;
+            let start_frame_flag = ((id >> 27) & 0x0001) != 0;
+            let multi_frame_flag = ((id >> 26) & 0x0001) != 0;
             let frame_id_nibble = ((id >> 16) & 0x000f) as u16;
             let device_address = ((id >> 0) & 0xffff) as u16;
+
+            println!("\nas{}\n", frame_id_nibble);
 
             if let Some(frame_data) = frame.data() {
                 let data_len = frame.dlc();
@@ -108,5 +110,19 @@ impl RossFrame {
         } else {
             Err(RossFrameError::FrameIsStandard)
         }
+    }
+
+    pub fn to_bxcan_frame(&self) -> Frame {
+        let mut id = 0x00;
+        id |= (self.not_error_flag as u32) << 28;
+        id |= (self.start_frame_flag as u32) << 27;
+        id |= (self.multi_frame_flag as u32) << 26;
+        match self.frame_id {
+            RossFrameId::LastFrameId(frame_id) => id |= ((frame_id & 0x0fff) as u32) << 16,
+            RossFrameId::CurrentFrameId(frame_id) => id |= ((frame_id & 0x0fff) as u32) << 16,
+        }
+        id |= (self.device_address & 0xffff) as u32;
+
+        Frame::new_data(ExtendedId::new(id).unwrap(), Data::new(&self.data[0..self.data_len as usize]).unwrap())
     }
 }
