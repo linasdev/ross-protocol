@@ -1,4 +1,4 @@
-use crate::ross_frame::{RossFrameId, RossFrame};
+use crate::ross_frame::{RossFrame, RossFrameId};
 use crate::ross_packet::RossPacketBuilder;
 
 const FRAME_DATA: [u8; 8] = [0x01; 8];
@@ -91,7 +91,7 @@ fn add_frame_test_single_frame_packet() {
 #[test]
 #[should_panic]
 fn add_frame_test_too_many_frames() {
-    let extra_frame = RossFrame{
+    let extra_frame = RossFrame {
         not_error_flag: true,
         start_frame_flag: false,
         multi_frame_flag: true,

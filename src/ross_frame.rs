@@ -1,4 +1,4 @@
-use bxcan::{Frame, Id, ExtendedId, Data};
+use bxcan::{Data, ExtendedId, Frame, Id};
 
 /// Frame id for packets with more than one frame
 #[derive(Debug, PartialEq)]
@@ -121,6 +121,9 @@ impl RossFrame {
         }
         id |= (self.device_address & 0xffff) as u32;
 
-        Frame::new_data(ExtendedId::new(id).unwrap(), Data::new(&self.data[0..self.data_len as usize]).unwrap())
+        Frame::new_data(
+            ExtendedId::new(id).unwrap(),
+            Data::new(&self.data[0..self.data_len as usize]).unwrap(),
+        )
     }
 }

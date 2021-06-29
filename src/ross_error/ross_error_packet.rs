@@ -1,2 +1,1 @@
-pub enum RossErrorPacket {
-}
+pub enum RossErrorPacket {}

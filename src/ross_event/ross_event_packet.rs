@@ -1,2 +1,1 @@
-pub enum RossEventPacket {
-}
+pub enum RossEventPacket {}
