@@ -1,6 +1,6 @@
 use bxcan::{Frame, ExtendedId};
 
-use crate::{RossFrameId, RossFrame};
+use crate::ross_frame::{RossFrameId, RossFrame};
 
 const FRAME_ID: u32 = 0x15555555;
 const FRAME_DATA: [u8; 8] = [0x55; 8];
