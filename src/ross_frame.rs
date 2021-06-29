@@ -60,8 +60,6 @@ impl RossFrame {
             let frame_id_nibble = ((id >> 16) & 0x000f) as u16;
             let device_address = ((id >> 0) & 0xffff) as u16;
 
-            println!("\nas{}\n", frame_id_nibble);
-
             if let Some(frame_data) = frame.data() {
                 let data_len = frame.dlc();
                 let mut data = [0u8; 8];
