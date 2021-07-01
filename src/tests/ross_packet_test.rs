@@ -38,7 +38,6 @@ fn new_test() {
     let packet = packet_builder.build().unwrap();
 
     assert_eq!(packet.is_error, !SINGLE_FRAME_PACKET.not_error_flag);
-    assert_eq!(packet.frame_count, 1);
     assert_eq!(packet.device_address, SINGLE_FRAME_PACKET.device_address);
     assert_eq!(packet.data, FRAME_DATA);
 }
@@ -56,7 +55,6 @@ fn add_frame_test() {
     let packet = packet_builder.build().unwrap();
 
     assert_eq!(packet.is_error, !MULTI_FRAME_PACKET1.not_error_flag);
-    assert_eq!(packet.frame_count, 2);
     assert_eq!(packet.device_address, MULTI_FRAME_PACKET1.device_address);
     assert_eq!(packet.data, MULTI_FRAME_PACKET_DATA);
 }

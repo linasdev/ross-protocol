@@ -7,7 +7,6 @@ use crate::ross_packet::RossPacket;
 
 const EVENT_PACKET: RossPacket = RossPacket {
     is_error: false,
-    frame_count: 1,
     device_address: 0xabab,
     data: Vec::new(),
 };

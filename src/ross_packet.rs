@@ -6,8 +6,6 @@ use crate::ross_frame::{RossFrame, RossFrameId};
 pub struct RossPacket {
     /// If this flag is set, the packet is considered to be an error packet
     pub is_error: bool,
-    /// Number of frames in the packet
-    pub frame_count: u16,
     /// Transmitting device's address
     pub device_address: u16,
     /// Packet data
@@ -108,7 +106,6 @@ impl RossPacketBuilder {
 
         Ok(RossPacket {
             is_error: self.is_error,
-            frame_count: self.expected_frame_count,
             device_address: self.device_address,
             data,
         })
