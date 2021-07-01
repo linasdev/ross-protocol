@@ -81,7 +81,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ross-firmware"
+name = "ross-protocol"
 version = "0.1.0"
 dependencies = [
  "bxcan",
