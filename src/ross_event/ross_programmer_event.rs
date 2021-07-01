@@ -1,3 +1,4 @@
+use alloc::vec;
 use core::convert::TryInto;
 
 use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
@@ -38,6 +39,24 @@ impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
             firmware_version,
         })
     }
+
+    fn to_packet(&self) -> RossPacket {
+        let mut data = vec!();
+
+        for byte in u16::to_be_bytes(ROSS_PROGRAMMER_HELLO_EVENT_CODE).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u32::to_be_bytes(self.firmware_version).iter() {
+            data.push(*byte);
+        }
+
+        RossPacket {
+            is_error: false,
+            device_address: self.programmer_address,
+            data,
+        }
+    }
 }
 
 pub struct RossProgrammerStartUploadEvent {
@@ -76,5 +95,31 @@ impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUp
             new_firmware_version,
             firmware_size,
         })
+    }
+
+    fn to_packet(&self) -> RossPacket {
+        let mut data = vec!();
+
+        for byte in u16::to_be_bytes(ROSS_PROGRAMMER_START_UPLOAD_EVENT_CODE).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u16::to_be_bytes(self.device_address).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u32::to_be_bytes(self.new_firmware_version).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u32::to_be_bytes(self.firmware_size).iter() {
+            data.push(*byte);
+        }
+
+        RossPacket {
+            is_error: false,
+            device_address: self.programmer_address,
+            data,
+        }
     }
 }

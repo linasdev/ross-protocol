@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 
 use crate::ross_frame::{RossFrame, RossFrameId};
 
+#[derive(Debug, PartialEq)]
 pub struct RossPacket {
     /// If this flag is set, the packet is considered to be an error packet
     pub is_error: bool,

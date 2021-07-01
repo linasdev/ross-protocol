@@ -13,4 +13,5 @@ pub enum RossConvertPacketError {
 
 pub trait RossConvertPacket<T> {
     fn try_from_packet(packet: RossPacket) -> Result<T, RossConvertPacketError>;
+    fn to_packet(&self) -> RossPacket;
 }

@@ -86,6 +86,30 @@ fn try_from_packet_bootloader_hello_event_wrong_event_type_test() {
 }
 
 #[test]
+fn to_packet_bootloader_hello_event_test() {
+    let programmer_start_upload_event = RossBootloaderHelloEvent {
+        device_address: 0xabab,
+        programmer_address: 0x0123,
+        firmware_version: 0x01234567,
+    };
+
+    let mut packet = EVENT_PACKET;
+    packet.data = vec![
+        0x00, // event code
+        0x00, // event code
+        0x01, // programmer_address
+        0x23, // programmer_address
+        0x01, // firmware_version
+        0x23, // firmware_version
+        0x45, // firmware_version
+        0x67, // firmware_version
+    ];
+
+    assert_eq!(programmer_start_upload_event.to_packet(), packet);
+}
+
+
+#[test]
 fn try_from_packet_bootloader_start_upload_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
@@ -100,4 +124,22 @@ fn try_from_packet_bootloader_start_upload_event_test() {
 
     assert_eq!(bootloader_start_upload_event.device_address, 0xabab);
     assert_eq!(bootloader_start_upload_event.programmer_address, 0x0123);
+}
+
+#[test]
+fn to_packet_bootloader_start_upload_event_test() {
+    let bootloader_start_upload_event = RossBootloaderStartUploadEvent {
+        device_address: 0xabab,
+        programmer_address: 0x0123,
+    };
+
+    let mut packet = EVENT_PACKET;
+    packet.data = vec![
+        0x00, // event code
+        0x01, // event code
+        0x01, // programmer_address
+        0x23, // programmer_address
+    ];
+
+    assert_eq!(bootloader_start_upload_event.to_packet(), packet);
 }
