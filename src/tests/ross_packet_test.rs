@@ -1,5 +1,5 @@
+use crate::ross_packet::*;
 use crate::ross_frame::{RossFrame, RossFrameId};
-use crate::ross_packet::RossPacketBuilder;
 
 const FRAME_DATA: [u8; 8] = [0x01; 8];
 const SINGLE_FRAME_PACKET: RossFrame = RossFrame {
@@ -31,6 +31,21 @@ const MULTI_FRAME_PACKET2: RossFrame = RossFrame {
     data_len: 8,
     data: FRAME_DATA,
 };
+
+#[test]
+fn to_frames_test() {
+    let packet = RossPacket {
+        is_error: !MULTI_FRAME_PACKET1.not_error_flag,
+        device_address: MULTI_FRAME_PACKET1.device_address,
+        data: [0x01; 14].to_vec(),
+    };
+
+    let frames = packet.to_frames();
+
+    assert_eq!(frames.len(), 2);
+    assert_eq!(frames[0], MULTI_FRAME_PACKET1);
+    assert_eq!(frames[1], MULTI_FRAME_PACKET2);
+}
 
 #[test]
 fn new_test() {

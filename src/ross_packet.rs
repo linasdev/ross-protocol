@@ -13,6 +13,68 @@ pub struct RossPacket {
     pub data: Vec<u8>,
 }
 
+impl RossPacket {
+    pub fn to_frames(&self) -> Vec<RossFrame> {
+        if self.data.len() <= 8 {
+            let mut data = [0; 8];
+
+            for i in 0..self.data.len() {
+                data[i] = self.data[i];
+            }
+
+            return vec!(RossFrame {
+                not_error_flag: !self.is_error,
+                start_frame_flag: true,
+                multi_frame_flag: false,
+                frame_id: RossFrameId::LastFrameId(0),
+                device_address: self.device_address,
+                data_len: self.data.len() as u8,
+                data
+            });
+        }
+
+        let frame_count = (self.data.len() - 1) / 7 + 1;
+        let mut frames = vec!();
+
+        for i in 0..frame_count {
+            let data_len = if i == frame_count - 1 {
+                7 - self.data.len() % 7 + 1
+            } else {
+                8
+            };
+
+            let mut data = [0u8; 8];
+
+            if i == 0 {
+                data[0] = ((frame_count - 1) & 0xff) as u8;
+            } else {
+                data[0] = (i & 0xff) as u8;
+            }
+
+
+            for j in 0..(data_len - 1) {
+                data[j + 1] = self.data[i * 7 + j];
+            }
+
+            frames.push(RossFrame {
+                not_error_flag: !self.is_error,
+                start_frame_flag: i == 0,
+                multi_frame_flag: true,
+                frame_id: if i == 0 {
+                    RossFrameId::LastFrameId(frame_count as u16 - 1)
+                } else {
+                    RossFrameId::CurrentFrameId(i as u16)
+                },
+                device_address: self.device_address,
+                data_len: data_len as u8,
+                data,
+            });
+        }
+
+        return frames;
+    }
+}
+
 #[derive(Debug)]
 pub enum RossPacketBuilderError {
     /// Frame supplied was not the next frame in the sequence+
