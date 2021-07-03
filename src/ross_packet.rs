@@ -101,7 +101,15 @@ pub struct RossPacketBuilder {
 impl RossPacketBuilder {
     pub fn expected_frame_count(&self) -> u16 {
         self.expected_frame_count
-    } 
+    }
+
+    pub fn frame_count(&self) -> u16 {
+        self.frames.len() as u16
+    }
+
+    pub fn frames_left(&self) -> u16 {
+        self.expected_frame_count() - self.frame_count()
+    }
 
     pub fn new(frame: RossFrame) -> Result<Self, RossPacketBuilderError> {
         if !frame.start_frame_flag {
