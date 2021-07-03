@@ -99,6 +99,10 @@ pub struct RossPacketBuilder {
 }
 
 impl RossPacketBuilder {
+    pub fn expected_frame_count(&self) -> u16 {
+        self.expected_frame_count
+    } 
+
     pub fn new(frame: RossFrame) -> Result<Self, RossPacketBuilderError> {
         if !frame.start_frame_flag {
             return Err(RossPacketBuilderError::OutOfOrder);
