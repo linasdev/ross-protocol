@@ -8,6 +8,7 @@ use crate::ross_packet::RossPacket;
 pub const ROSS_PROGRAMMER_HELLO_EVENT_CODE: u16 = 0x0002;
 pub const ROSS_PROGRAMMER_START_UPLOAD_EVENT_CODE: u16 = 0x0003;
 
+#[derive(Debug, PartialEq)]
 pub struct RossProgrammerHelloEvent {
     pub programmer_address: u16,
     pub firmware_version: u32,
@@ -59,6 +60,7 @@ impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct RossProgrammerStartUploadEvent {
     pub programmer_address: u16,
     pub device_address: u16,

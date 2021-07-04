@@ -1,7 +1,7 @@
 use crate::ross_event::ross_event_packet::RossEventPacketError;
 use crate::ross_packet::RossPacket;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum RossConvertPacketError {
     /// Provided packet was not appropriately sized
     WrongSize,

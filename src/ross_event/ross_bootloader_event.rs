@@ -8,6 +8,7 @@ use crate::ross_packet::RossPacket;
 pub const ROSS_BOOTLOADER_HELLO_EVENT_CODE: u16 = 0x0000;
 pub const ROSS_BOOTLOADER_START_UPLOAD_EVENT_CODE: u16 = 0x0001;
 
+#[derive(Debug, PartialEq)]
 pub struct RossBootloaderHelloEvent {
     pub device_address: u16,
     pub programmer_address: u16,
@@ -66,6 +67,7 @@ impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
     }
 }
 
+#[derive(Debug, PartialEq)]
 pub struct RossBootloaderStartUploadEvent {
     pub device_address: u16,
     pub programmer_address: u16,

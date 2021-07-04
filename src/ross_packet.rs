@@ -75,7 +75,7 @@ impl RossPacket {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum RossPacketBuilderError {
     /// Frame supplied was not the next frame in the sequence+
     OutOfOrder,
@@ -91,6 +91,7 @@ pub enum RossPacketBuilderError {
     MissingFrames,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct RossPacketBuilder {
     is_error: bool,
     expected_frame_count: u16,

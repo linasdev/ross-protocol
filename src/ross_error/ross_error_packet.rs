@@ -1,1 +1,4 @@
-pub enum RossErrorPacket {}
+#[derive(Debug, PartialEq)]
+pub enum RossErrorPacket {
+    
+}

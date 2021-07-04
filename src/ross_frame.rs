@@ -9,7 +9,7 @@ pub enum RossFrameId {
     CurrentFrameId(u16),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum RossFrameError {
     /// Received a standard frame instead of an extended one
     FrameIsStandard,
