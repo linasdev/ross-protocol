@@ -1,3 +1,4 @@
+use crate::ross_event::ross_general_event::*;
 use crate::ross_event::ross_bootloader_event::*;
 use crate::ross_event::ross_programmer_event::*;
 
@@ -9,8 +10,10 @@ pub enum RossEventPacketError {
 
 #[derive(Debug, PartialEq)]
 pub enum RossEventPacket {
+    Ack(RossAckEvent),
+    Data(RossDataEvent),
+
     BootloaderHello(RossBootloaderHelloEvent),
-    BootloaderStartUpload(RossBootloaderStartUploadEvent),
 
     ProgrammerHello(RossProgrammerHelloEvent),
     ProgrammerStartUpload(RossProgrammerStartUploadEvent),
