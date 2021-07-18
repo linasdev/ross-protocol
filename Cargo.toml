@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 bxcan = "^0.4.0"
+nb = "1.0.0"
