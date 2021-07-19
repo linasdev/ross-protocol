@@ -39,7 +39,7 @@ pub struct RossFrame {
 }
 
 impl RossFrame {
-    /// Converts from a bxcan frame to a ross frame
+    /// Converts a bxcan frame to a ross frame
     ///
     /// This is the extended id structure for a ross frame:
     /// bit 0:          NOT_ERROR_FLAG (if this bit is low, the frame is considered to be an error frame)
@@ -110,6 +110,7 @@ impl RossFrame {
         }
     }
 
+    /// Converts a ross frame to a bxcan frame
     pub fn to_bxcan_frame(&self) -> Frame {
         let mut id = 0x00;
         id |= (self.not_error_flag as u32) << 28;

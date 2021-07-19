@@ -8,7 +8,7 @@ pub mod ross_event;
 pub mod ross_frame;
 pub mod ross_packet;
 pub mod ross_packet_type;
-pub mod ross_can;
+pub mod ross_interface;
 
 #[cfg(test)]
 mod tests;
