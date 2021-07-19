@@ -2,7 +2,7 @@ use bxcan::{ExtendedId, Frame};
 
 use crate::ross_frame::{RossFrame, RossFrameId};
 
-const FRAME_ID: u32 = 0x15555555;
+const FRAME_ID: u32 = 0x1405_5555;
 const FRAME_DATA: [u8; 8] = [0x55; 8];
 const ROSS_FRAME: RossFrame = RossFrame {
     not_error_flag: true,

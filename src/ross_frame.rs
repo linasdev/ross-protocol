@@ -117,8 +117,8 @@ impl RossFrame {
         id |= (self.start_frame_flag as u32) << 27;
         id |= (self.multi_frame_flag as u32) << 26;
         match self.frame_id {
-            RossFrameId::LastFrameId(frame_id) => id |= ((frame_id & 0x0fff) as u32) << 16,
-            RossFrameId::CurrentFrameId(frame_id) => id |= ((frame_id & 0x0fff) as u32) << 16,
+            RossFrameId::LastFrameId(frame_id) => id |= ((frame_id & 0x0f00) as u32 >> 8) << 16,
+            RossFrameId::CurrentFrameId(frame_id) => id |= ((frame_id & 0x0f00) as u32 >> 8) << 16,
         }
         id |= (self.device_address & 0xffff) as u32;
 
