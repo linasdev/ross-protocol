@@ -16,7 +16,7 @@ fn try_from_packet_programmer_hello_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
         0x00, // event code
-        0x02, // event code
+        0x01, // event code
         0x01, // firmware_version
         0x23, // firmware_version
         0x45, // firmware_version
@@ -35,7 +35,7 @@ fn try_from_packet_programmer_hello_event_wrong_size_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
         0x00, // event code
-        0x02, // event code
+        0x01, // event code
         0x01, // firmware_version
         0x23, // firmware_version
         0x45, // firmware_version
@@ -52,7 +52,7 @@ fn try_from_packet_programmer_hello_event_wrong_type_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
         0x00, // event code
-        0x02, // event code
+        0x01, // event code
         0x01, // firmware_version
         0x23, // firmware_version
         0x45, // firmware_version
@@ -69,7 +69,7 @@ fn try_from_packet_programmer_hello_event_wrong_event_type_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
         0x00, // event code
-        0x03, // event code
+        0x02, // event code
         0x01, // firmware_version
         0x23, // firmware_version
         0x45, // firmware_version
@@ -90,7 +90,7 @@ fn to_packet_programmer_hello_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
         0x00, // event code
-        0x02, // event code
+        0x01, // event code
         0x01, // firmware_version
         0x23, // firmware_version
         0x45, // firmware_version
@@ -105,7 +105,7 @@ fn try_from_packet_programmer_start_upload_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
         0x00, // event code
-        0x03, // event code
+        0x02, // event code
         0x01, // device_address
         0x23, // device_address
         0x01, // new_firmware_version
@@ -142,7 +142,7 @@ fn to_packet_programmer_start_upload_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
         0x00, // event code
-        0x03, // event code
+        0x02, // event code
         0x01, // device_address
         0x23, // device_address
         0x01, // new_firmware_version
