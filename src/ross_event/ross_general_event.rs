@@ -14,7 +14,7 @@ pub struct RossAckEvent {
 }
 
 impl RossConvertPacket<RossAckEvent> for RossAckEvent {
-    fn try_from_packet(packet: RossPacket) -> Result<Self, RossConvertPacketError> {
+    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
         if packet.data.len() != 4 {
             return Err(RossConvertPacketError::WrongSize);
         }
@@ -67,7 +67,7 @@ pub struct RossDataEvent {
 }
 
 impl RossConvertPacket<RossDataEvent> for RossDataEvent {
-    fn try_from_packet(packet: RossPacket) -> Result<Self, RossConvertPacketError> {
+    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
         if packet.is_error {
             return Err(RossConvertPacketError::WrongType);
         }

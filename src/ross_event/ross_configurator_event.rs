@@ -11,7 +11,7 @@ pub struct RossConfiguratorHelloEvent {
 }
 
 impl RossConvertPacket<RossConfiguratorHelloEvent> for RossConfiguratorHelloEvent {
-    fn try_from_packet(packet: RossPacket) -> Result<Self, RossConvertPacketError> {
+    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
         if packet.data.len() != 2 {
             return Err(RossConvertPacketError::WrongSize);
         }

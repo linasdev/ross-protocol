@@ -24,7 +24,7 @@ fn try_from_packet_programmer_hello_event_test() {
         0x67, // firmware_version
     ];
 
-    let programmer_hello_event = RossProgrammerHelloEvent::try_from_packet(packet).unwrap();
+    let programmer_hello_event = RossProgrammerHelloEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(programmer_hello_event.programmer_address, 0xabab);
     assert_eq!(programmer_hello_event.firmware_version, 0x01234567);
@@ -44,7 +44,7 @@ fn try_from_packet_programmer_hello_event_wrong_size_test() {
         0x00, // extra byte
     ];
 
-    RossProgrammerHelloEvent::try_from_packet(packet).unwrap();
+    RossProgrammerHelloEvent::try_from_packet(&packet).unwrap();
 }
 
 #[test]
@@ -61,7 +61,7 @@ fn try_from_packet_programmer_hello_event_wrong_type_test() {
     ];
     packet.is_error = true;
 
-    RossProgrammerHelloEvent::try_from_packet(packet).unwrap();
+    RossProgrammerHelloEvent::try_from_packet(&packet).unwrap();
 }
 
 #[test]
@@ -79,7 +79,7 @@ fn try_from_packet_programmer_hello_event_wrong_event_type_test() {
         0x67, // firmware_version
     ];
 
-    RossProgrammerHelloEvent::try_from_packet(packet).unwrap();
+    RossProgrammerHelloEvent::try_from_packet(&packet).unwrap();
 }
 
 #[test]
@@ -121,7 +121,7 @@ fn try_from_packet_programmer_start_upload_event_test() {
     ];
 
     let programmer_start_upload_event =
-        RossProgrammerStartUploadEvent::try_from_packet(packet).unwrap();
+        RossProgrammerStartUploadEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(programmer_start_upload_event.programmer_address, 0xabab);
     assert_eq!(programmer_start_upload_event.device_address, 0x0123);

@@ -22,7 +22,7 @@ fn try_from_packet_ack_event_test() {
         0x23, // transmitter_address
     ];
 
-    let ack_event = RossAckEvent::try_from_packet(packet).unwrap();
+    let ack_event = RossAckEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(ack_event.device_address, 0xabab);
     assert_eq!(ack_event.transmitter_address, 0x0123);
@@ -61,7 +61,7 @@ fn try_from_packet_data_event_test() {
         0x04, // data
     ];
 
-    let data_event = RossDataEvent::try_from_packet(packet).unwrap();
+    let data_event = RossDataEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(data_event.device_address, 0xabab);
     assert_eq!(data_event.data_len, 0x0005);

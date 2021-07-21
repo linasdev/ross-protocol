@@ -13,7 +13,7 @@ pub struct RossProgrammerHelloEvent {
 }
 
 impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
-    fn try_from_packet(packet: RossPacket) -> Result<Self, RossConvertPacketError> {
+    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
         if packet.data.len() != 6 {
             return Err(RossConvertPacketError::WrongSize);
         }
@@ -67,7 +67,7 @@ pub struct RossProgrammerStartUploadEvent {
 }
 
 impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUploadEvent {
-    fn try_from_packet(packet: RossPacket) -> Result<Self, RossConvertPacketError> {
+    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
         if packet.data.len() != 12 {
             return Err(RossConvertPacketError::WrongSize);
         }

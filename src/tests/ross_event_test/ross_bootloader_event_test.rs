@@ -26,7 +26,7 @@ fn try_from_packet_bootloader_hello_event_test() {
         0x67, // firmware_version
     ];
 
-    let bootloader_hello_event = RossBootloaderHelloEvent::try_from_packet(packet).unwrap();
+    let bootloader_hello_event = RossBootloaderHelloEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(bootloader_hello_event.device_address, 0xabab);
     assert_eq!(bootloader_hello_event.programmer_address, 0x0123);
@@ -49,7 +49,7 @@ fn try_from_packet_bootloader_hello_event_wrong_size_test() {
         0x00, // extra byte
     ];
 
-    RossBootloaderHelloEvent::try_from_packet(packet).unwrap();
+    RossBootloaderHelloEvent::try_from_packet(&packet).unwrap();
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn try_from_packet_bootloader_hello_event_wrong_type_test() {
     ];
     packet.is_error = true;
 
-    RossBootloaderHelloEvent::try_from_packet(packet).unwrap();
+    RossBootloaderHelloEvent::try_from_packet(&packet).unwrap();
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn try_from_packet_bootloader_hello_event_wrong_event_type_test() {
         0x67, // firmware_version
     ];
 
-    RossBootloaderHelloEvent::try_from_packet(packet).unwrap();
+    RossBootloaderHelloEvent::try_from_packet(&packet).unwrap();
 }
 
 #[test]

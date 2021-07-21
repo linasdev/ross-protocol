@@ -20,7 +20,7 @@ fn try_from_packet_configurator_hello_event_test() {
         ((ROSS_CONFIGURATOR_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
     ];
 
-    RossConfiguratorHelloEvent::try_from_packet(packet).unwrap();
+    RossConfiguratorHelloEvent::try_from_packet(&packet).unwrap();
 }
 
 #[test]

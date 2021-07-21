@@ -14,7 +14,7 @@ pub struct RossBootloaderHelloEvent {
 }
 
 impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
-    fn try_from_packet(packet: RossPacket) -> Result<Self, RossConvertPacketError> {
+    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
         if packet.data.len() != 8 {
             return Err(RossConvertPacketError::WrongSize);
         }
