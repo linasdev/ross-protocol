@@ -56,6 +56,8 @@ impl<S: Read<u8> + Write<u8>> RossUsart<S> {
 
                         if let Some(ref mut packet_builder) = self.packet_builder {
                             if let Err(err) = packet_builder.add_frame(ross_frame) {
+                                self.packet_builder = None;
+
                                 return Err(RossUsartError::BuilderError(err));
                             }
                         } else {
@@ -71,6 +73,8 @@ impl<S: Read<u8> + Write<u8>> RossUsart<S> {
                                     Ok(packet) => packet,
                                     Err(err) => return Err(RossUsartError::BuilderError(err)),
                                 };
+
+                                self.packet_builder = None;
 
                                 return Ok(packet);
                             }

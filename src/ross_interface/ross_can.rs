@@ -37,6 +37,8 @@ impl<I: Instance> RossCan<I> {
 
                     if let Some(ref mut packet_builder) = self.packet_builder {
                         if let Err(err) = packet_builder.add_frame(ross_frame) {
+                            self.packet_builder = None;
+
                             return Err(RossCanError::BuilderError(err));
                         }
                     } else {
@@ -52,6 +54,8 @@ impl<I: Instance> RossCan<I> {
                                 Ok(packet) => packet,
                                 Err(err) => return Err(RossCanError::BuilderError(err)),
                             };
+
+                            self.packet_builder = None;
 
                             return Ok(packet);
                         }
