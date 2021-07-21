@@ -3,6 +3,7 @@ use alloc::vec::Vec;
 
 use crate::ross_convert_packet::RossConvertPacket;
 use crate::ross_event::ross_bootloader_event::*;
+use crate::ross_event::ross_event_code::*;
 use crate::ross_packet::RossPacket;
 
 const EVENT_PACKET: RossPacket = RossPacket {
@@ -15,8 +16,8 @@ const EVENT_PACKET: RossPacket = RossPacket {
 fn try_from_packet_bootloader_hello_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        0x00, // event code
-        0x00, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01, // programmer_address
         0x23, // programmer_address
         0x01, // firmware_version
@@ -37,8 +38,8 @@ fn try_from_packet_bootloader_hello_event_test() {
 fn try_from_packet_bootloader_hello_event_wrong_size_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        0x00, // event code
-        0x00, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01, // programmer_address
         0x23, // programmer_address
         0x01, // firmware_version
@@ -56,8 +57,8 @@ fn try_from_packet_bootloader_hello_event_wrong_size_test() {
 fn try_from_packet_bootloader_hello_event_wrong_type_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        0x00, // event code
-        0x00, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01, // programmer_address
         0x23, // programmer_address
         0x01, // firmware_version
@@ -75,12 +76,13 @@ fn try_from_packet_bootloader_hello_event_wrong_type_test() {
 fn try_from_packet_bootloader_hello_event_wrong_event_type_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        0x00, // event code
-        0x01, // event code
-        0x01, // programmer_address
-        0x23, // programmer_address
+        ((ROSS_PROGRAMMER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((ROSS_PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01, // firmware_version
+        0x23, // firmware_version
+        0x45, // firmware_version
+        0x67, // firmware_version
     ];
-    packet.is_error = true;
 
     RossBootloaderHelloEvent::try_from_packet(packet).unwrap();
 }
@@ -95,8 +97,8 @@ fn to_packet_bootloader_hello_event_test() {
 
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        0x00, // event code
-        0x00, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01, // programmer_address
         0x23, // programmer_address
         0x01, // firmware_version
