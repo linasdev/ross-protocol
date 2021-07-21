@@ -4,10 +4,8 @@ use core::convert::TryInto;
 
 use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
 use crate::ross_event::ross_event_packet::RossEventPacketError;
+use crate::ross_event::ross_event_code::*;
 use crate::ross_packet::RossPacket;
-
-pub const ROSS_ACK_EVENT_CODE: u16 = 0x0003;
-pub const ROSS_DATA_EVENT_CODE: u16 = 0x0004;
 
 #[derive(Debug, PartialEq)]
 pub struct RossAckEvent {
