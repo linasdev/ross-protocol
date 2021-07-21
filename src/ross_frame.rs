@@ -1,6 +1,6 @@
 use alloc::vec;
 use alloc::vec::Vec;
-use cobs::{max_encoding_length, decode, encode};
+use cobs::{decode, encode, max_encoding_length};
 
 use bxcan::{Data, ExtendedId, Frame, Id};
 
@@ -146,13 +146,13 @@ impl RossFrame {
     ///     bit 3:      RESERVED (reserved for future use)
     ///     bits 4 - 7: LAST_FRAME_ID (most significant nibble (0xf00) of the last frame id)
     ///                 FRAME_ID (most significant nibble (0xf00) of the current frame id)
-    /// 
+    ///
     /// byte 1:         LAST_FRAME_ID (least significant byte (0x0ff) of the last frame id)
     ///                 FRAME_ID (least significant byte (0x0ff) of the current frame id)
-    /// 
+    ///
     /// byte 2:         DEVICE_ADDRESS (most significant byte (0xff00) of the device address)
     /// byte 3:         DEVICE_ADDRESS (least significant byte (0x00ff) of the device address)
-    /// 
+    ///
     /// byte 4:         DATA_LEN (length of frame data)
     /// bytes 5 - 12:   DATA (frame data)
     pub fn from_usart_frame(encoded: Vec<u8>) -> Result<Self, RossFrameError> {
@@ -197,7 +197,7 @@ impl RossFrame {
 
     /// Converts a ross frame to a USART frame
     pub fn to_usart_frame(&self) -> Vec<u8> {
-       let mut frame = vec![0x00u8; self.data_len as usize + 5];
+        let mut frame = vec![0x00u8; self.data_len as usize + 5];
 
         // byte 0
         frame[0] |= (self.not_error_flag as u8) << 7;
@@ -208,7 +208,7 @@ impl RossFrame {
             RossFrameId::LastFrameId(frame_id) => frame[0] |= ((frame_id & 0x0f00) >> 8) as u8,
             RossFrameId::CurrentFrameId(frame_id) => frame[0] |= ((frame_id & 0x0f00) >> 8) as u8,
         }
-        
+
         // byte 1
         match self.frame_id {
             RossFrameId::LastFrameId(frame_id) => frame[1] |= (frame_id & 0x00ff) as u8,

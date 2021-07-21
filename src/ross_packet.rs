@@ -22,19 +22,19 @@ impl RossPacket {
                 data[i] = self.data[i];
             }
 
-            return vec!(RossFrame {
+            return vec![RossFrame {
                 not_error_flag: !self.is_error,
                 start_frame_flag: true,
                 multi_frame_flag: false,
                 frame_id: RossFrameId::LastFrameId(0),
                 device_address: self.device_address,
                 data_len: self.data.len() as u8,
-                data
-            });
+                data,
+            }];
         }
 
         let frame_count = (self.data.len() - 1) / 7 + 1;
-        let mut frames = vec!();
+        let mut frames = vec![];
 
         for i in 0..frame_count {
             let data_len = if i == frame_count - 1 {
@@ -50,7 +50,6 @@ impl RossPacket {
             } else {
                 data[0] = (i & 0xff) as u8;
             }
-
 
             for j in 0..(data_len - 1) {
                 data[j + 1] = self.data[i * 7 + j];

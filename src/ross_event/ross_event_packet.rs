@@ -1,5 +1,5 @@
-use crate::ross_event::ross_general_event::*;
 use crate::ross_event::ross_bootloader_event::*;
+use crate::ross_event::ross_general_event::*;
 use crate::ross_event::ross_programmer_event::*;
 
 #[derive(Debug, PartialEq)]

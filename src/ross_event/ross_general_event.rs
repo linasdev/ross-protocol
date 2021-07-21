@@ -3,8 +3,8 @@ use alloc::vec::Vec;
 use core::convert::TryInto;
 
 use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
-use crate::ross_event::ross_event_packet::RossEventPacketError;
 use crate::ross_event::ross_event_code::*;
+use crate::ross_event::ross_event_packet::RossEventPacketError;
 use crate::ross_packet::RossPacket;
 
 #[derive(Debug, PartialEq)]
@@ -23,9 +23,7 @@ impl RossConvertPacket<RossAckEvent> for RossAckEvent {
             return Err(RossConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != ROSS_ACK_EVENT_CODE
-        {
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != ROSS_ACK_EVENT_CODE {
             return Err(RossConvertPacketError::EventPacket(
                 RossEventPacketError::WrongEventType,
             ));
@@ -41,7 +39,7 @@ impl RossConvertPacket<RossAckEvent> for RossAckEvent {
     }
 
     fn to_packet(&self) -> RossPacket {
-        let mut data = vec!();
+        let mut data = vec![];
 
         for byte in u16::to_be_bytes(ROSS_ACK_EVENT_CODE).iter() {
             data.push(*byte);
@@ -72,9 +70,7 @@ impl RossConvertPacket<RossDataEvent> for RossDataEvent {
             return Err(RossConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != ROSS_DATA_EVENT_CODE
-        {
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != ROSS_DATA_EVENT_CODE {
             return Err(RossConvertPacketError::EventPacket(
                 RossEventPacketError::WrongEventType,
             ));
@@ -96,12 +92,12 @@ impl RossConvertPacket<RossDataEvent> for RossDataEvent {
         Ok(RossDataEvent {
             device_address,
             data_len,
-            data
+            data,
         })
     }
 
     fn to_packet(&self) -> RossPacket {
-        let mut data = vec!();
+        let mut data = vec![];
 
         for byte in u16::to_be_bytes(ROSS_DATA_EVENT_CODE).iter() {
             data.push(*byte);

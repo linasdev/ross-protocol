@@ -2,8 +2,8 @@ use alloc::vec;
 use core::convert::TryInto;
 
 use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
-use crate::ross_event::ross_event_packet::RossEventPacketError;
 use crate::ross_event::ross_event_code::*;
+use crate::ross_event::ross_event_packet::RossEventPacketError;
 use crate::ross_packet::RossPacket;
 
 #[derive(Debug, PartialEq)]
@@ -43,7 +43,7 @@ impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
     }
 
     fn to_packet(&self) -> RossPacket {
-        let mut data = vec!();
+        let mut data = vec![];
 
         for byte in u16::to_be_bytes(ROSS_BOOTLOADER_HELLO_EVENT_CODE).iter() {
             data.push(*byte);

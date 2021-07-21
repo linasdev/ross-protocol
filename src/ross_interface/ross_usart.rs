@@ -31,7 +31,7 @@ impl<S: Read<u8> + Write<u8>> RossUsart<S> {
             match self.serial.read() {
                 Ok(frame_start) => {
                     if frame_start == 0x00 {
-                        let mut frame = vec!();
+                        let mut frame = vec![];
 
                         let expected_length = match block!(self.serial.read()) {
                             Ok(length) => length,
@@ -64,19 +64,19 @@ impl<S: Read<u8> + Write<u8>> RossUsart<S> {
                                 Err(err) => return Err(RossUsartError::BuilderError(err)),
                             };
                         }
-    
+
                         if let Some(ref mut packet_builder) = self.packet_builder {
                             if packet_builder.frames_left() == 0 {
                                 let packet = match packet_builder.build() {
                                     Ok(packet) => packet,
                                     Err(err) => return Err(RossUsartError::BuilderError(err)),
                                 };
-    
+
                                 return Ok(packet);
                             }
                         }
                     }
-                },
+                }
                 Err(_) => break,
             }
         }

@@ -1,5 +1,5 @@
-use crate::ross_packet::*;
 use crate::ross_frame::{RossFrame, RossFrameId};
+use crate::ross_packet::*;
 
 const FRAME_DATA: [u8; 8] = [0x01; 8];
 const SINGLE_FRAME_PACKET: RossFrame = RossFrame {

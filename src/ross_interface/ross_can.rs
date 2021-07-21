@@ -56,7 +56,7 @@ impl<I: Instance> RossCan<I> {
                             return Ok(packet);
                         }
                     }
-                },
+                }
                 Err(_) => break,
             }
         }

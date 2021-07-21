@@ -33,7 +33,7 @@ fn to_bxcan_frame_test() {
 
 #[test]
 fn from_usart_frame_test() {
-    let usart_frame = vec!(
+    let usart_frame = vec![
         0x0e, // COBS
         0xa5, // byte 0
         0x55, // FRAME_ID
@@ -48,7 +48,7 @@ fn from_usart_frame_test() {
         0x55, // DATA
         0x55, // DATA
         0x55, // DATA
-    );
+    ];
 
     let ross_frame = RossFrame::from_usart_frame(usart_frame).unwrap();
 
@@ -58,7 +58,7 @@ fn from_usart_frame_test() {
 #[test]
 fn to_usart_frame_test() {
     let usart_frame = ROSS_FRAME.to_usart_frame();
-    let usart_frame_expected = vec!(
+    let usart_frame_expected = vec![
         0x0e, // COBS
         0xa5, // byte 0
         0x55, // FRAME_ID
@@ -73,7 +73,7 @@ fn to_usart_frame_test() {
         0x55, // DATA
         0x55, // DATA
         0x55, // DATA
-    );
+    ];
 
     assert_eq!(usart_frame, usart_frame_expected);
 }
