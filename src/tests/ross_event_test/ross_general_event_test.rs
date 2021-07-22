@@ -52,6 +52,8 @@ fn try_from_packet_data_event_test() {
     packet.data = vec![
         ((ROSS_DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ROSS_DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                       // receiver_address
+        0x23,                                       // receiver_address
         0x00,                                       // data_len
         0x05,                                       // data_len
         0x00,                                       // data
@@ -63,7 +65,8 @@ fn try_from_packet_data_event_test() {
 
     let data_event = RossDataEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(data_event.device_address, 0xabab);
+    assert_eq!(data_event.transmitter_address, 0xabab);
+    assert_eq!(data_event.receiver_address, 0x0123);
     assert_eq!(data_event.data_len, 0x0005);
     assert_eq!(data_event.data, vec!(0x00, 0x01, 0x02, 0x03, 0x04));
 }
@@ -71,7 +74,8 @@ fn try_from_packet_data_event_test() {
 #[test]
 fn to_packet_data_event_test() {
     let data_event = RossDataEvent {
-        device_address: 0xabab,
+        transmitter_address: 0xabab,
+        receiver_address: 0x0123,
         data_len: 0x0005,
         data: vec![0x00, 0x01, 0x02, 0x03, 0x04],
     };
@@ -80,6 +84,8 @@ fn to_packet_data_event_test() {
     packet.data = vec![
         ((ROSS_DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ROSS_DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                       // receiver_address
+        0x23,                                       // receiver_address
         0x00,                                       // data_len
         0x05,                                       // data_len
         0x00,                                       // data

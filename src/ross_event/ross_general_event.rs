@@ -59,7 +59,8 @@ impl RossConvertPacket<RossAckEvent> for RossAckEvent {
 
 #[derive(Debug, PartialEq)]
 pub struct RossDataEvent {
-    pub device_address: u16,
+    pub transmitter_address: u16,
+    pub receiver_address: u16,
     pub data_len: u16,
     pub data: Vec<u8>,
 }
@@ -76,21 +77,23 @@ impl RossConvertPacket<RossDataEvent> for RossDataEvent {
             ));
         }
 
-        let device_address = packet.device_address;
-        let data_len = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let transmitter_address = packet.device_address;
+        let receiver_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let data_len = u16::from_be_bytes(packet.data[4..=5].try_into().unwrap());
 
-        if packet.data.len() != data_len as usize + 4 {
+        if packet.data.len() != data_len as usize + 6 {
             return Err(RossConvertPacketError::WrongSize);
         }
 
         let mut data = vec![0; data_len as usize];
 
         for i in 0..data_len as usize {
-            data[i] = packet.data[i + 4];
+            data[i] = packet.data[i + 6];
         }
 
         Ok(RossDataEvent {
-            device_address,
+            transmitter_address,
+            receiver_address,
             data_len,
             data,
         })
@@ -100,6 +103,10 @@ impl RossConvertPacket<RossDataEvent> for RossDataEvent {
         let mut data = vec![];
 
         for byte in u16::to_be_bytes(ROSS_DATA_EVENT_CODE).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u16::to_be_bytes(self.receiver_address).iter() {
             data.push(*byte);
         }
 
@@ -113,7 +120,7 @@ impl RossConvertPacket<RossDataEvent> for RossDataEvent {
 
         RossPacket {
             is_error: false,
-            device_address: self.device_address,
+            device_address: self.transmitter_address,
             data,
         }
     }
