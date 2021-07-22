@@ -38,7 +38,11 @@ impl RossPacket {
 
         for i in 0..frame_count {
             let data_len = if i == frame_count - 1 {
-                7 - self.data.len() % 7 + 1
+                if self.data.len() % 7 == 0 {
+                    8
+                } else {
+                    self.data.len() % 7 + 1
+                }
             } else {
                 8
             };
