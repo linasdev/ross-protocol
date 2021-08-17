@@ -18,7 +18,7 @@ pub enum RossProtocolError {
 pub struct RossProtocol<I: RossInterface> {
     device_address: u16,
     interface: I,
-    handlers: BTreeMap<u32, Box<dyn Fn(&RossPacket)>>,
+    handlers: BTreeMap<u32, Box<dyn Fn(&RossPacket, &mut I)>>,
 }
 
 impl<I: RossInterface> RossProtocol<I> {
@@ -54,7 +54,7 @@ impl<I: RossInterface> RossProtocol<I> {
         }
     }
 
-    pub fn add_packet_handler(&mut self, handler: Box<dyn Fn(&RossPacket)>) -> Result<u32, RossProtocolError> {
+    pub fn add_packet_handler(&mut self, handler: Box<dyn Fn(&RossPacket, &mut I)>) -> Result<u32, RossProtocolError> {
         let id = self.get_next_handler_id();
 
         self.handlers.insert(id, handler);
@@ -69,9 +69,9 @@ impl<I: RossInterface> RossProtocol<I> {
         }
     }
 
-    fn handle_packet(&self, packet: &RossPacket) {
+    fn handle_packet(&mut self, packet: &RossPacket) {
         for handler in self.handlers.values() {
-            handler(packet);
+            handler(packet, &mut self.interface);
         }
     }
 
