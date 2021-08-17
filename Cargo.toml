@@ -16,3 +16,11 @@ embedded-hal = "^0.2.5"
 [dependencies.cobs]
 version = "^0.1.4"
 default-features = false
+
+[dependencies.serialport]
+version = "^4.0.1"
+optional = true
+
+[features]
+default = []
+std = ["serialport"]
