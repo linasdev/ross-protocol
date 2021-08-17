@@ -18,8 +18,8 @@ fn try_from_packet_bootloader_hello_event_test() {
     packet.data = vec![
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // programmer_address
-        0x23,                                                   // programmer_address
+        0x01,                                                   // bootloader_address
+        0x23,                                                   // bootloader_address
         0x01,                                                   // firmware_version
         0x23,                                                   // firmware_version
         0x45,                                                   // firmware_version
@@ -28,8 +28,8 @@ fn try_from_packet_bootloader_hello_event_test() {
 
     let bootloader_hello_event = RossBootloaderHelloEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(bootloader_hello_event.device_address, 0xabab);
-    assert_eq!(bootloader_hello_event.programmer_address, 0x0123);
+    assert_eq!(bootloader_hello_event.programmer_address, 0xabab);
+    assert_eq!(bootloader_hello_event.bootloader_address, 0x0123);
     assert_eq!(bootloader_hello_event.firmware_version, 0x01234567);
 }
 
@@ -40,8 +40,8 @@ fn try_from_packet_bootloader_hello_event_wrong_size_test() {
     packet.data = vec![
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // programmer_address
-        0x23,                                                   // programmer_address
+        0x01,                                                   // bootloader_address
+        0x23,                                                   // bootloader_address
         0x01,                                                   // firmware_version
         0x23,                                                   // firmware_version
         0x45,                                                   // firmware_version
@@ -59,8 +59,8 @@ fn try_from_packet_bootloader_hello_event_wrong_type_test() {
     packet.data = vec![
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // programmer_address
-        0x23,                                                   // programmer_address
+        0x01,                                                   // bootloader_address
+        0x23,                                                   // bootloader_address
         0x01,                                                   // firmware_version
         0x23,                                                   // firmware_version
         0x45,                                                   // firmware_version
@@ -78,6 +78,8 @@ fn try_from_packet_bootloader_hello_event_wrong_event_type_test() {
     packet.data = vec![
         ((ROSS_PROGRAMMER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ROSS_PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0xab,                                                   // programmer_address
+        0xab,                                                   // programmer_address
         0x01,                                                   // firmware_version
         0x23,                                                   // firmware_version
         0x45,                                                   // firmware_version
@@ -90,8 +92,8 @@ fn try_from_packet_bootloader_hello_event_wrong_event_type_test() {
 #[test]
 fn to_packet_bootloader_hello_event_test() {
     let bootloader_hello_event = RossBootloaderHelloEvent {
-        device_address: 0xabab,
-        programmer_address: 0x0123,
+        programmer_address: 0xabab,
+        bootloader_address: 0x0123,
         firmware_version: 0x01234567,
     };
 
@@ -99,8 +101,8 @@ fn to_packet_bootloader_hello_event_test() {
     packet.data = vec![
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ROSS_BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // programmer_address
-        0x23,                                                   // programmer_address
+        0x01,                                                   // bootloader_address
+        0x23,                                                   // bootloader_address
         0x01,                                                   // firmware_version
         0x23,                                                   // firmware_version
         0x45,                                                   // firmware_version
