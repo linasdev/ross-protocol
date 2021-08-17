@@ -11,6 +11,7 @@ pub mod ross_usart;
 #[cfg(feature="std")]
 pub mod ross_serial;
 
+#[derive(Debug)]
 pub enum RossInterfaceError {
     CanError(RossCanError),
     UsartError(RossUsartError),
