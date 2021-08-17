@@ -2,6 +2,7 @@
 
 extern crate alloc;
 
+pub mod ross_protocol;
 pub mod ross_convert_packet;
 pub mod ross_error;
 pub mod ross_event;
