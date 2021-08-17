@@ -15,13 +15,13 @@ pub enum RossProtocolError {
     NoSuchHandler,
 }
 
-pub struct RossProtocol<I: RossInterface> {
+pub struct RossProtocol<'a, I: RossInterface> {
     device_address: u16,
     interface: I,
-    handlers: BTreeMap<u32, Box<dyn Fn(&RossPacket, &mut I)>>,
+    handlers: BTreeMap<u32, Box<dyn Fn(&RossPacket, &mut I) + 'a>>,
 }
 
-impl<I: RossInterface> RossProtocol<I> {
+impl<'a, I: RossInterface> RossProtocol<'a, I> {
     pub fn new(device_address: u16, interface: I) -> Self {
         RossProtocol {
             device_address,
@@ -54,7 +54,7 @@ impl<I: RossInterface> RossProtocol<I> {
         }
     }
 
-    pub fn add_packet_handler(&mut self, handler: Box<dyn Fn(&RossPacket, &mut I)>) -> Result<u32, RossProtocolError> {
+    pub fn add_packet_handler(&'a mut self, handler: Box<dyn Fn(&RossPacket, &mut I) + 'a>) -> Result<u32, RossProtocolError> {
         let id = self.get_next_handler_id();
 
         self.handlers.insert(id, handler);
