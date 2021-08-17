@@ -7,6 +7,8 @@ pub const BROADCAST_ADDRESS: u16 = 0xffff;
 pub const TRANSACTION_TIMEOUT_MS: u128 = 2000;
 pub const PACKET_TIMEOUT_MS: u128 = 500;
 
+
+#[derive(Debug)]
 pub enum RossProtocolError {
     InterfaceError(RossInterfaceError),
     NoSuchHandler,
