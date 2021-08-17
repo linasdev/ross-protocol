@@ -8,7 +8,7 @@ use crate::ross_packet::RossPacket;
 
 #[derive(Debug, PartialEq)]
 pub struct RossBootloaderHelloEvent {
-    pub device_address: u16,
+    pub bootloader_address: u16,
     pub programmer_address: u16,
     pub firmware_version: u32,
 }
@@ -31,12 +31,12 @@ impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
             ));
         }
 
-        let device_address = packet.device_address;
-        let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let programmer_address = packet.device_address;
+        let bootloader_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
         Ok(RossBootloaderHelloEvent {
-            device_address,
+            bootloader_address,
             programmer_address,
             firmware_version,
         })
@@ -49,7 +49,7 @@ impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
             data.push(*byte);
         }
 
-        for byte in u16::to_be_bytes(self.programmer_address).iter() {
+        for byte in u16::to_be_bytes(self.bootloader_address).iter() {
             data.push(*byte);
         }
 
@@ -59,7 +59,7 @@ impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
 
         RossPacket {
             is_error: false,
-            device_address: self.device_address,
+            device_address: self.programmer_address,
             data,
         }
     }

@@ -3,6 +3,7 @@ use alloc::collections::BTreeMap;
 use crate::ross_packet::RossPacket;
 use crate::ross_interface::*;
 
+pub const BROADCAST_ADDRESS: u16 = 0xffff;
 pub const TRANSACTION_TIMEOUT_MS: u128 = 2000;
 pub const PACKET_TIMEOUT_MS: u128 = 500;
 
@@ -29,7 +30,8 @@ impl<I: RossInterface> RossProtocol<I> {
     pub fn tick(&mut self) -> Result<(), RossProtocolError> {
         match self.interface.try_get_packet() {
             Ok(packet) => {
-                if packet.device_address == self.device_address {
+                if packet.device_address == self.device_address ||
+                   packet.device_address == BROADCAST_ADDRESS {
                     self.handle_packet(&packet);
                 }
 

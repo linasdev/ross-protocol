@@ -5,6 +5,7 @@ use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
 use crate::ross_event::ross_event_code::*;
 use crate::ross_event::ross_event_packet::RossEventPacketError;
 use crate::ross_packet::RossPacket;
+use crate::ross_protocol::BROADCAST_ADDRESS;
 
 #[derive(Debug, PartialEq)]
 pub struct RossProgrammerHelloEvent {
@@ -14,7 +15,7 @@ pub struct RossProgrammerHelloEvent {
 
 impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
     fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
-        if packet.data.len() != 6 {
+        if packet.data.len() != 8 {
             return Err(RossConvertPacketError::WrongSize);
         }
 
@@ -30,8 +31,8 @@ impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
             ));
         }
 
-        let programmer_address = packet.device_address;
-        let firmware_version = u32::from_be_bytes(packet.data[2..=5].try_into().unwrap());
+        let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
         Ok(RossProgrammerHelloEvent {
             programmer_address,
@@ -46,13 +47,17 @@ impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
             data.push(*byte);
         }
 
+        for byte in u16::to_be_bytes(self.programmer_address).iter() {
+            data.push(*byte);
+        }
+
         for byte in u32::to_be_bytes(self.firmware_version).iter() {
             data.push(*byte);
         }
 
         RossPacket {
             is_error: false,
-            device_address: self.programmer_address,
+            device_address: BROADCAST_ADDRESS,
             data,
         }
     }
@@ -60,8 +65,8 @@ impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
 
 #[derive(Debug, PartialEq)]
 pub struct RossProgrammerStartUploadEvent {
+    pub receiver_address: u16,
     pub programmer_address: u16,
-    pub device_address: u16,
     pub new_firmware_version: u32,
     pub firmware_size: u32,
 }
@@ -84,14 +89,14 @@ impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUp
             ));
         }
 
-        let programmer_address = packet.device_address;
-        let device_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let receiver_address = packet.device_address;
+        let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let new_firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
         let firmware_size = u32::from_be_bytes(packet.data[8..=11].try_into().unwrap());
 
         Ok(RossProgrammerStartUploadEvent {
+            receiver_address,
             programmer_address,
-            device_address,
             new_firmware_version,
             firmware_size,
         })
@@ -104,7 +109,7 @@ impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUp
             data.push(*byte);
         }
 
-        for byte in u16::to_be_bytes(self.device_address).iter() {
+        for byte in u16::to_be_bytes(self.programmer_address).iter() {
             data.push(*byte);
         }
 
@@ -118,7 +123,7 @@ impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUp
 
         RossPacket {
             is_error: false,
-            device_address: self.programmer_address,
+            device_address: self.receiver_address,
             data,
         }
     }

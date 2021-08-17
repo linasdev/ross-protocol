@@ -5,6 +5,7 @@ use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
 use crate::ross_event::ross_event_code::*;
 use crate::ross_event::ross_event_packet::RossEventPacketError;
 use crate::ross_packet::RossPacket;
+use crate::ross_protocol::BROADCAST_ADDRESS;
 
 #[derive(Debug, PartialEq)]
 pub struct RossConfiguratorHelloEvent {}
@@ -39,7 +40,7 @@ impl RossConvertPacket<RossConfiguratorHelloEvent> for RossConfiguratorHelloEven
 
         RossPacket {
             is_error: false,
-            device_address: 0x0000,
+            device_address: BROADCAST_ADDRESS,
             data,
         }
     }
