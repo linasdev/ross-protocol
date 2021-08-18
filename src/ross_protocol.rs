@@ -54,7 +54,7 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
         }
     }
 
-    pub fn add_packet_handler(&'a mut self, handler: Box<dyn FnMut(&RossPacket, &mut I) + 'a>) -> Result<u32, RossProtocolError> {
+    pub fn add_packet_handler<'s>(&'s mut self, handler: Box<dyn FnMut(&RossPacket, &mut I) + 'a>) -> Result<u32, RossProtocolError> {
         let id = self.get_next_handler_id();
 
         self.handlers.insert(id, handler);
