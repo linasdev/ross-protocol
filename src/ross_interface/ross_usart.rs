@@ -3,8 +3,8 @@ use embedded_hal::serial::{Read, Write};
 use nb::block;
 
 use crate::ross_frame::*;
-use crate::ross_packet::*;
 use crate::ross_interface::*;
+use crate::ross_packet::*;
 
 #[derive(Debug, PartialEq)]
 pub enum RossUsartError {
@@ -35,13 +35,21 @@ impl<S: Read<u8> + Write<u8>> RossInterface for RossUsart<S> {
 
                         let expected_length = match block!(self.serial.read()) {
                             Ok(length) => length,
-                            Err(_) => return Err(RossInterfaceError::UsartError(RossUsartError::ReadError)),
+                            Err(_) => {
+                                return Err(RossInterfaceError::UsartError(
+                                    RossUsartError::ReadError,
+                                ))
+                            }
                         };
 
                         loop {
                             match block!(self.serial.read()) {
                                 Ok(byte) => frame.push(byte),
-                                Err(_) => return Err(RossInterfaceError::UsartError(RossUsartError::ReadError)),
+                                Err(_) => {
+                                    return Err(RossInterfaceError::UsartError(
+                                        RossUsartError::ReadError,
+                                    ))
+                                }
                             }
 
                             if frame.len() == expected_length as usize {

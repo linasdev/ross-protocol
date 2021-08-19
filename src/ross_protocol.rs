@@ -1,9 +1,9 @@
-use alloc::collections::BTreeMap;
 use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
 
-use crate::ross_packet::RossPacket;
 use crate::ross_convert_packet::RossConvertPacket;
 use crate::ross_interface::*;
+use crate::ross_packet::RossPacket;
 
 pub const BROADCAST_ADDRESS: u16 = 0xffff;
 
@@ -32,19 +32,20 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
     pub fn tick(&mut self) -> Result<(), RossProtocolError> {
         match self.interface.try_get_packet() {
             Ok(packet) => {
-                if packet.device_address == self.device_address ||
-                   packet.device_address == BROADCAST_ADDRESS {
+                if packet.device_address == self.device_address
+                    || packet.device_address == BROADCAST_ADDRESS
+                {
                     self.handle_packet(&packet, true);
                 } else {
                     self.handle_packet(&packet, false);
                 }
 
                 Ok(())
-            },
+            }
             Err(err) => match err {
                 RossInterfaceError::NoPacketReceived => Ok(()),
                 _ => Err(RossProtocolError::InterfaceError(err)),
-            }
+            },
         }
     }
 
@@ -55,7 +56,11 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
         }
     }
 
-    pub fn add_packet_handler<'s>(&'s mut self, handler: Box<dyn FnMut(&RossPacket, &mut I) + 'a>, capture_all_addresses: bool) -> Result<u32, RossProtocolError> {
+    pub fn add_packet_handler<'s>(
+        &'s mut self,
+        handler: Box<dyn FnMut(&RossPacket, &mut I) + 'a>,
+        capture_all_addresses: bool,
+    ) -> Result<u32, RossProtocolError> {
         let id = self.get_next_handler_id();
 
         self.handlers.insert(id, (handler, capture_all_addresses));
@@ -77,7 +82,6 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
         retry_count: u32,
         wait_closure: F,
     ) -> Result<R, RossProtocolError> {
-
         for _ in 0..retry_count {
             self.send_packet(&packet)?;
 
@@ -99,7 +103,7 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
                         RossInterfaceError::NoPacketReceived => break,
                         _ => return Err(RossProtocolError::InterfaceError(err)),
                     },
-                } 
+                }
             }
         }
 

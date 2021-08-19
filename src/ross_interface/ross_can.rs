@@ -2,8 +2,8 @@ use bxcan::{Can, Instance};
 use nb::block;
 
 use crate::ross_frame::*;
-use crate::ross_packet::*;
 use crate::ross_interface::*;
+use crate::ross_packet::*;
 
 #[derive(Debug, PartialEq)]
 pub enum RossCanError {

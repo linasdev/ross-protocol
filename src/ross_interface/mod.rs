@@ -1,21 +1,21 @@
-use crate::ross_interface::ross_can::RossCanError;
-use crate::ross_interface::ross_usart::RossUsartError;
-#[cfg(feature="std")]
-use crate::ross_interface::ross_serial::RossSerialError;
-use crate::ross_packet::RossPacketBuilderError;
 use crate::ross_frame::RossFrameError;
+use crate::ross_interface::ross_can::RossCanError;
+#[cfg(feature = "std")]
+use crate::ross_interface::ross_serial::RossSerialError;
+use crate::ross_interface::ross_usart::RossUsartError;
 use crate::ross_packet::RossPacket;
+use crate::ross_packet::RossPacketBuilderError;
 
 pub mod ross_can;
-pub mod ross_usart;
-#[cfg(feature="std")]
+#[cfg(feature = "std")]
 pub mod ross_serial;
+pub mod ross_usart;
 
 #[derive(Debug)]
 pub enum RossInterfaceError {
     CanError(RossCanError),
     UsartError(RossUsartError),
-    #[cfg(feature="std")]
+    #[cfg(feature = "std")]
     SerialError(RossSerialError),
     BuilderError(RossPacketBuilderError),
     FrameError(RossFrameError),
