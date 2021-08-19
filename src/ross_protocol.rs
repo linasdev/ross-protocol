@@ -1,5 +1,7 @@
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
+use alloc::vec;
+use alloc::vec::Vec;
 
 use crate::ross_convert_packet::RossConvertPacket;
 use crate::ross_interface::*;
@@ -108,6 +110,43 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
         }
 
         Err(RossProtocolError::PacketTimeout)
+    }
+
+    pub fn exchange_packets<F: Fn(), R: RossConvertPacket<R>>(
+        &mut self,
+        packet: RossPacket,
+        capture_all_addresses: bool,
+        retry_count: u32,
+        wait_closure: F,
+    ) -> Result<Vec<R>, RossProtocolError> {
+        let mut events = vec![];
+
+        for _ in 0..retry_count {
+            self.send_packet(&packet)?;
+
+            wait_closure();
+
+            loop {
+                match self.interface.try_get_packet() {
+                    Ok(received_packet) => {
+                        if capture_all_addresses
+                            || received_packet.device_address == self.device_address
+                            || received_packet.device_address == BROADCAST_ADDRESS
+                        {
+                            if let Ok(received_event) = R::try_from_packet(&received_packet) {
+                                events.push(received_event);
+                            }
+                        }
+                    }
+                    Err(err) => match err {
+                        RossInterfaceError::NoPacketReceived => break,
+                        _ => return Err(RossProtocolError::InterfaceError(err)),
+                    },
+                }
+            }
+        }
+
+        return Ok(events);
     }
 
     fn handle_packet(&mut self, packet: &RossPacket, owned_address: bool) {
