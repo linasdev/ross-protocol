@@ -2,17 +2,16 @@ use alloc::collections::BTreeMap;
 use alloc::boxed::Box;
 
 use crate::ross_packet::RossPacket;
+use crate::ross_convert_packet::RossConvertPacket;
 use crate::ross_interface::*;
 
 pub const BROADCAST_ADDRESS: u16 = 0xffff;
-pub const TRANSACTION_TIMEOUT_MS: u128 = 2000;
-pub const PACKET_TIMEOUT_MS: u128 = 500;
-
 
 #[derive(Debug)]
 pub enum RossProtocolError {
     InterfaceError(RossInterfaceError),
     NoSuchHandler,
+    PacketTimeout,
 }
 
 pub struct RossProtocol<'a, I: RossInterface> {
@@ -69,6 +68,42 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
             None => Err(RossProtocolError::NoSuchHandler),
             Some(_) => Ok(()),
         }
+    }
+
+    pub fn exchange_packet<F: Fn(), R: RossConvertPacket<R>>(
+        &mut self,
+        packet: RossPacket,
+        capture_all_addresses: bool,
+        retry_count: u32,
+        wait_closure: F,
+    ) -> Result<R, RossProtocolError> {
+
+        for _ in 0..retry_count {
+            self.send_packet(&packet)?;
+
+            wait_closure();
+
+            loop {
+                match self.interface.try_get_packet() {
+                    Ok(received_packet) => {
+                        if capture_all_addresses
+                            || received_packet.device_address == self.device_address
+                            || received_packet.device_address == BROADCAST_ADDRESS
+                        {
+                            if let Ok(received_event) = R::try_from_packet(&received_packet) {
+                                return Ok(received_event);
+                            }
+                        }
+                    }
+                    Err(err) => match err {
+                        RossInterfaceError::NoPacketReceived => break,
+                        _ => return Err(RossProtocolError::InterfaceError(err)),
+                    },
+                } 
+            }
+        }
+
+        Err(RossProtocolError::PacketTimeout)
     }
 
     fn handle_packet(&mut self, packet: &RossPacket, owned_address: bool) {
