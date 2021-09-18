@@ -18,8 +18,8 @@ fn try_from_packet_ack_event_test() {
     packet.data = vec![
         ((ACK_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ACK_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                      // transmitter_address
-        0x23,                                      // transmitter_address
+        0x01,                                 // transmitter_address
+        0x23,                                 // transmitter_address
     ];
 
     let ack_event = AckEvent::try_from_packet(&packet).unwrap();
@@ -39,8 +39,8 @@ fn to_packet_ack_event_test() {
     packet.data = vec![
         ((ACK_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((ACK_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                      // transmitter_address
-        0x23,                                      // transmitter_address
+        0x01,                                 // transmitter_address
+        0x23,                                 // transmitter_address
     ];
 
     assert_eq!(ack_event.to_packet(), packet);
@@ -52,15 +52,15 @@ fn try_from_packet_data_event_test() {
     packet.data = vec![
         ((DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                       // transmitter_address
-        0x23,                                       // transmitter_address
-        0x00,                                       // data_len
-        0x05,                                       // data_len
-        0x00,                                       // data
-        0x01,                                       // data
-        0x02,                                       // data
-        0x03,                                       // data
-        0x04,                                       // data
+        0x01,                                  // transmitter_address
+        0x23,                                  // transmitter_address
+        0x00,                                  // data_len
+        0x05,                                  // data_len
+        0x00,                                  // data
+        0x01,                                  // data
+        0x02,                                  // data
+        0x03,                                  // data
+        0x04,                                  // data
     ];
 
     let data_event = DataEvent::try_from_packet(&packet).unwrap();
@@ -84,15 +84,15 @@ fn to_packet_data_event_test() {
     packet.data = vec![
         ((DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                       // transmitter_address
-        0x23,                                       // transmitter_address
-        0x00,                                       // data_len
-        0x05,                                       // data_len
-        0x00,                                       // data
-        0x01,                                       // data
-        0x02,                                       // data
-        0x03,                                       // data
-        0x04,                                       // data
+        0x01,                                  // transmitter_address
+        0x23,                                  // transmitter_address
+        0x00,                                  // data_len
+        0x05,                                  // data_len
+        0x00,                                  // data
+        0x01,                                  // data
+        0x02,                                  // data
+        0x03,                                  // data
+        0x04,                                  // data
     ];
 
     assert_eq!(data_event.to_packet(), packet);

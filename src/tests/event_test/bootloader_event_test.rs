@@ -18,12 +18,12 @@ fn try_from_packet_bootloader_hello_event_test() {
     packet.data = vec![
         ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // bootloader_address
-        0x23,                                                   // bootloader_address
-        0x01,                                                   // firmware_version
-        0x23,                                                   // firmware_version
-        0x45,                                                   // firmware_version
-        0x67,                                                   // firmware_version
+        0x01,                                              // bootloader_address
+        0x23,                                              // bootloader_address
+        0x01,                                              // firmware_version
+        0x23,                                              // firmware_version
+        0x45,                                              // firmware_version
+        0x67,                                              // firmware_version
     ];
 
     let bootloader_hello_event = BootloaderHelloEvent::try_from_packet(&packet).unwrap();
@@ -40,13 +40,13 @@ fn try_from_packet_bootloader_hello_event_wrong_size_test() {
     packet.data = vec![
         ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // bootloader_address
-        0x23,                                                   // bootloader_address
-        0x01,                                                   // firmware_version
-        0x23,                                                   // firmware_version
-        0x45,                                                   // firmware_version
-        0x67,                                                   // firmware_version
-        0x00,                                                   // extra byte
+        0x01,                                              // bootloader_address
+        0x23,                                              // bootloader_address
+        0x01,                                              // firmware_version
+        0x23,                                              // firmware_version
+        0x45,                                              // firmware_version
+        0x67,                                              // firmware_version
+        0x00,                                              // extra byte
     ];
 
     BootloaderHelloEvent::try_from_packet(&packet).unwrap();
@@ -59,12 +59,12 @@ fn try_from_packet_bootloader_hello_event_wrong_type_test() {
     packet.data = vec![
         ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // bootloader_address
-        0x23,                                                   // bootloader_address
-        0x01,                                                   // firmware_version
-        0x23,                                                   // firmware_version
-        0x45,                                                   // firmware_version
-        0x67,                                                   // firmware_version
+        0x01,                                              // bootloader_address
+        0x23,                                              // bootloader_address
+        0x01,                                              // firmware_version
+        0x23,                                              // firmware_version
+        0x45,                                              // firmware_version
+        0x67,                                              // firmware_version
     ];
     packet.is_error = true;
 
@@ -78,12 +78,12 @@ fn try_from_packet_bootloader_hello_event_wrong_event_type_test() {
     packet.data = vec![
         ((PROGRAMMER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0xab,                                                   // programmer_address
-        0xab,                                                   // programmer_address
-        0x01,                                                   // firmware_version
-        0x23,                                                   // firmware_version
-        0x45,                                                   // firmware_version
-        0x67,                                                   // firmware_version
+        0xab,                                              // programmer_address
+        0xab,                                              // programmer_address
+        0x01,                                              // firmware_version
+        0x23,                                              // firmware_version
+        0x45,                                              // firmware_version
+        0x67,                                              // firmware_version
     ];
 
     BootloaderHelloEvent::try_from_packet(&packet).unwrap();
@@ -101,12 +101,12 @@ fn to_packet_bootloader_hello_event_test() {
     packet.data = vec![
         ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
         ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                   // bootloader_address
-        0x23,                                                   // bootloader_address
-        0x01,                                                   // firmware_version
-        0x23,                                                   // firmware_version
-        0x45,                                                   // firmware_version
-        0x67,                                                   // firmware_version
+        0x01,                                              // bootloader_address
+        0x23,                                              // bootloader_address
+        0x01,                                              // firmware_version
+        0x23,                                              // firmware_version
+        0x45,                                              // firmware_version
+        0x67,                                              // firmware_version
     ];
 
     assert_eq!(bootloader_hello_event.to_packet(), packet);

@@ -23,8 +23,7 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != PROGRAMMER_HELLO_EVENT_CODE
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != PROGRAMMER_HELLO_EVENT_CODE
         {
             return Err(ConvertPacketError::EventPacket(
                 EventPacketError::WrongEventType,

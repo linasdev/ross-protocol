@@ -36,9 +36,7 @@ impl<S: Read<u8> + Write<u8>> Interface for Usart<S> {
                         let expected_length = match block!(self.serial.read()) {
                             Ok(length) => length,
                             Err(_) => {
-                                return Err(InterfaceError::UsartError(
-                                    UsartError::ReadError,
-                                ))
+                                return Err(InterfaceError::UsartError(UsartError::ReadError))
                             }
                         };
 
@@ -46,9 +44,7 @@ impl<S: Read<u8> + Write<u8>> Interface for Usart<S> {
                             match block!(self.serial.read()) {
                                 Ok(byte) => frame.push(byte),
                                 Err(_) => {
-                                    return Err(InterfaceError::UsartError(
-                                        UsartError::ReadError,
-                                    ))
+                                    return Err(InterfaceError::UsartError(UsartError::ReadError))
                                 }
                             }
 

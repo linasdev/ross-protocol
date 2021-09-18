@@ -38,18 +38,16 @@ impl Interface for Serial {
                         let expected_length = match self.port.read_exact(&mut buf[..]) {
                             Ok(_) => buf[0],
                             Err(err) => {
-                                return Err(InterfaceError::SerialError(
-                                    SerialError::ReadError(err),
-                                ))
+                                return Err(InterfaceError::SerialError(SerialError::ReadError(
+                                    err,
+                                )))
                             }
                         };
 
                         let mut frame = vec![0x00; expected_length as usize];
 
                         if let Err(err) = self.port.read_exact(&mut frame[..]) {
-                            return Err(InterfaceError::SerialError(
-                                SerialError::ReadError(err),
-                            ));
+                            return Err(InterfaceError::SerialError(SerialError::ReadError(err)));
                         }
 
                         let ross_frame = match Frame::from_usart_frame(frame) {
@@ -84,11 +82,7 @@ impl Interface for Serial {
                         }
                     }
                 }
-                Err(err) => {
-                    return Err(InterfaceError::SerialError(SerialError::ReadError(
-                        err,
-                    )))
-                }
+                Err(err) => return Err(InterfaceError::SerialError(SerialError::ReadError(err))),
             }
         }
     }
@@ -99,29 +93,21 @@ impl Interface for Serial {
 
             let buf = [0x00; 1];
             if let Err(err) = self.port.write(&buf) {
-                return Err(InterfaceError::SerialError(
-                    SerialError::WriteError(err),
-                ));
+                return Err(InterfaceError::SerialError(SerialError::WriteError(err)));
             }
 
             let buf = [frame_buf.len() as u8; 1];
             if let Err(err) = self.port.write(&buf) {
-                return Err(InterfaceError::SerialError(
-                    SerialError::WriteError(err),
-                ));
+                return Err(InterfaceError::SerialError(SerialError::WriteError(err)));
             }
 
             if let Err(err) = self.port.write(&frame_buf) {
-                return Err(InterfaceError::SerialError(
-                    SerialError::WriteError(err),
-                ));
+                return Err(InterfaceError::SerialError(SerialError::WriteError(err)));
             }
         }
 
         if let Err(err) = self.port.flush() {
-            Err(InterfaceError::SerialError(
-                SerialError::WriteError(err),
-            ))
+            Err(InterfaceError::SerialError(SerialError::WriteError(err)))
         } else {
             Ok(())
         }
