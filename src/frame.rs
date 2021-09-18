@@ -2,11 +2,11 @@ use alloc::vec;
 use alloc::vec::Vec;
 use cobs::{decode, encode, max_encoding_length};
 
-use bxcan::{Data, ExtendedId, Frame, Id};
+use bxcan::{Data, ExtendedId, Frame as BxFrame, Id};
 
 /// Frame id for packets with more than one frame
 #[derive(Debug, PartialEq)]
-pub enum RossFrameId {
+pub enum FrameId {
     /// Last frame id inside current packet (12 bits)
     LastFrameId(u16),
     /// Current frame id (12 bits)
@@ -14,7 +14,7 @@ pub enum RossFrameId {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum RossFrameError {
+pub enum FrameError {
     /// Received a standard frame instead of an extended one
     FrameIsStandard,
     /// Received a remote frame instead of a data one
@@ -29,7 +29,7 @@ pub enum RossFrameError {
 
 /// Ross compatible representation of a CAN frame
 #[derive(Debug, PartialEq)]
-pub struct RossFrame {
+pub struct Frame {
     /// If this bit is low, the frame is considered to be an error frame
     pub not_error_flag: bool,
     /// If this bit is high, the frame is considered to be the first frame of a packet
@@ -37,7 +37,7 @@ pub struct RossFrame {
     /// If this bit is high, the frame is considered to be only a part of a packet
     pub multi_frame_flag: bool,
     /// Either the last or the current frame id inside current packet, depending on `start_frame_flag`
-    pub frame_id: RossFrameId,
+    pub frame_id: FrameId,
     /// Transmitting device's address
     pub device_address: u16,
     /// Length of frame data
@@ -46,7 +46,7 @@ pub struct RossFrame {
     pub data: [u8; 8],
 }
 
-impl RossFrame {
+impl Frame {
     /// Converts a bxcan frame to a ross frame
     ///
     /// This is the extended id structure for a ross frame:
@@ -58,7 +58,7 @@ impl RossFrame {
     ///                 FRAME_ID (most significant nibble (0xf00) of the current frame id)
     /// bits 12 - 27    DEVICE_ADDRESS (transmitting device's address)
     ///
-    pub fn from_bxcan_frame(frame: Frame) -> Result<Self, RossFrameError> {
+    pub fn from_bxcan_frame(frame: BxFrame) -> Result<Self, FrameError> {
         if let Id::Extended(id) = frame.id() {
             let id = id.as_raw();
 
@@ -78,16 +78,16 @@ impl RossFrame {
 
                 if multi_frame_flag {
                     if data_len == 0 {
-                        return Err(RossFrameError::FrameIdMissing);
+                        return Err(FrameError::FrameIdMissing);
                     }
 
                     let frame_id = if start_frame_flag {
-                        RossFrameId::LastFrameId((frame_id_nibble << 8) | data[0] as u16)
+                        FrameId::LastFrameId((frame_id_nibble << 8) | data[0] as u16)
                     } else {
-                        RossFrameId::CurrentFrameId((frame_id_nibble << 8) | data[0] as u16)
+                        FrameId::CurrentFrameId((frame_id_nibble << 8) | data[0] as u16)
                     };
 
-                    Ok(RossFrame {
+                    Ok(Frame {
                         not_error_flag,
                         start_frame_flag,
                         multi_frame_flag,
@@ -98,9 +98,9 @@ impl RossFrame {
                     })
                 } else {
                     let start_frame_flag = true;
-                    let frame_id = RossFrameId::LastFrameId(0x00);
+                    let frame_id = FrameId::LastFrameId(0x00);
 
-                    Ok(RossFrame {
+                    Ok(Frame {
                         not_error_flag,
                         start_frame_flag,
                         multi_frame_flag,
@@ -111,26 +111,26 @@ impl RossFrame {
                     })
                 }
             } else {
-                Err(RossFrameError::FrameIsRemote)
+                Err(FrameError::FrameIsRemote)
             }
         } else {
-            Err(RossFrameError::FrameIsStandard)
+            Err(FrameError::FrameIsStandard)
         }
     }
 
     /// Converts a ross frame to a bxcan frame
-    pub fn to_bxcan_frame(&self) -> Frame {
+    pub fn to_bxcan_frame(&self) -> BxFrame {
         let mut id = 0x00;
         id |= (self.not_error_flag as u32) << 28;
         id |= (self.start_frame_flag as u32) << 27;
         id |= (self.multi_frame_flag as u32) << 26;
         match self.frame_id {
-            RossFrameId::LastFrameId(frame_id) => id |= ((frame_id & 0x0f00) as u32 >> 8) << 16,
-            RossFrameId::CurrentFrameId(frame_id) => id |= ((frame_id & 0x0f00) as u32 >> 8) << 16,
+            FrameId::LastFrameId(frame_id) => id |= ((frame_id & 0x0f00) as u32 >> 8) << 16,
+            FrameId::CurrentFrameId(frame_id) => id |= ((frame_id & 0x0f00) as u32 >> 8) << 16,
         }
         id |= (self.device_address & 0xffff) as u32;
 
-        Frame::new_data(
+        BxFrame::new_data(
             ExtendedId::new(id).unwrap(),
             Data::new(&self.data[0..self.data_len as usize]).unwrap(),
         )
@@ -155,15 +155,15 @@ impl RossFrame {
     ///
     /// byte 4:         DATA_LEN (length of frame data)
     /// bytes 5 - 12:   DATA (frame data)
-    pub fn from_usart_frame(encoded: Vec<u8>) -> Result<Self, RossFrameError> {
+    pub fn from_usart_frame(encoded: Vec<u8>) -> Result<Self, FrameError> {
         let mut frame = vec![0; encoded.len()];
         match decode(&encoded[..], &mut frame[..]) {
             Ok(n) => frame.truncate(n),
-            Err(_) => return Err(RossFrameError::CobsError),
+            Err(_) => return Err(FrameError::CobsError),
         }
 
         if frame.len() < 5 || frame.len() != frame[4] as usize + 5 {
-            return Err(RossFrameError::WrongSize);
+            return Err(FrameError::WrongSize);
         }
 
         let not_error_flag = ((frame[0] >> 7) & 0x01) != 0;
@@ -171,9 +171,9 @@ impl RossFrame {
         let multi_frame_flag = ((frame[0] >> 5) & 0x01) != 0;
 
         let frame_id = if start_frame_flag {
-            RossFrameId::LastFrameId((((frame[0] & 0x0f) as u16) << 8) | frame[1] as u16)
+            FrameId::LastFrameId((((frame[0] & 0x0f) as u16) << 8) | frame[1] as u16)
         } else {
-            RossFrameId::CurrentFrameId((((frame[0] & 0x0f) as u16) << 8) | frame[1] as u16)
+            FrameId::CurrentFrameId((((frame[0] & 0x0f) as u16) << 8) | frame[1] as u16)
         };
 
         let device_address = ((frame[2] as u16) << 8) | frame[3] as u16;
@@ -184,7 +184,7 @@ impl RossFrame {
             data[i] = frame[i + 5];
         }
 
-        Ok(RossFrame {
+        Ok(Frame {
             not_error_flag,
             start_frame_flag,
             multi_frame_flag,
@@ -205,14 +205,14 @@ impl RossFrame {
         frame[0] |= (self.multi_frame_flag as u8) << 5;
 
         match self.frame_id {
-            RossFrameId::LastFrameId(frame_id) => frame[0] |= ((frame_id & 0x0f00) >> 8) as u8,
-            RossFrameId::CurrentFrameId(frame_id) => frame[0] |= ((frame_id & 0x0f00) >> 8) as u8,
+            FrameId::LastFrameId(frame_id) => frame[0] |= ((frame_id & 0x0f00) >> 8) as u8,
+            FrameId::CurrentFrameId(frame_id) => frame[0] |= ((frame_id & 0x0f00) >> 8) as u8,
         }
 
         // byte 1
         match self.frame_id {
-            RossFrameId::LastFrameId(frame_id) => frame[1] |= (frame_id & 0x00ff) as u8,
-            RossFrameId::CurrentFrameId(frame_id) => frame[1] |= (frame_id & 0x00ff) as u8,
+            FrameId::LastFrameId(frame_id) => frame[1] |= (frame_id & 0x00ff) as u8,
+            FrameId::CurrentFrameId(frame_id) => frame[1] |= (frame_id & 0x00ff) as u8,
         }
 
         // bytes 2 & 3

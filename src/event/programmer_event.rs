@@ -1,49 +1,49 @@
 use alloc::vec;
 use core::convert::TryInto;
 
-use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
-use crate::ross_event::ross_event_code::*;
-use crate::ross_event::ross_event_packet::RossEventPacketError;
-use crate::ross_packet::RossPacket;
-use crate::ross_protocol::BROADCAST_ADDRESS;
+use crate::convert_packet::{ConvertPacket, ConvertPacketError};
+use crate::event::event_code::*;
+use crate::event::event_packet::EventPacketError;
+use crate::packet::Packet;
+use crate::protocol::BROADCAST_ADDRESS;
 
 #[derive(Debug, PartialEq)]
-pub struct RossProgrammerHelloEvent {
+pub struct ProgrammerHelloEvent {
     pub programmer_address: u16,
     pub firmware_version: u32,
 }
 
-impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
-    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
+impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
+    fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 8 {
-            return Err(RossConvertPacketError::WrongSize);
+            return Err(ConvertPacketError::WrongSize);
         }
 
         if packet.is_error {
-            return Err(RossConvertPacketError::WrongType);
+            return Err(ConvertPacketError::WrongType);
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != ROSS_PROGRAMMER_HELLO_EVENT_CODE
+            != PROGRAMMER_HELLO_EVENT_CODE
         {
-            return Err(RossConvertPacketError::EventPacket(
-                RossEventPacketError::WrongEventType,
+            return Err(ConvertPacketError::EventPacket(
+                EventPacketError::WrongEventType,
             ));
         }
 
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
-        Ok(RossProgrammerHelloEvent {
+        Ok(ProgrammerHelloEvent {
             programmer_address,
             firmware_version,
         })
     }
 
-    fn to_packet(&self) -> RossPacket {
+    fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(ROSS_PROGRAMMER_HELLO_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(PROGRAMMER_HELLO_EVENT_CODE).iter() {
             data.push(*byte);
         }
 
@@ -55,7 +55,7 @@ impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
             data.push(*byte);
         }
 
-        RossPacket {
+        Packet {
             is_error: false,
             device_address: BROADCAST_ADDRESS,
             data,
@@ -64,28 +64,28 @@ impl RossConvertPacket<RossProgrammerHelloEvent> for RossProgrammerHelloEvent {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct RossProgrammerStartUploadEvent {
+pub struct ProgrammerStartUploadEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
     pub new_firmware_version: u32,
     pub firmware_size: u32,
 }
 
-impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUploadEvent {
-    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
+impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
+    fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 12 {
-            return Err(RossConvertPacketError::WrongSize);
+            return Err(ConvertPacketError::WrongSize);
         }
 
         if packet.is_error {
-            return Err(RossConvertPacketError::WrongType);
+            return Err(ConvertPacketError::WrongType);
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != ROSS_PROGRAMMER_START_UPLOAD_EVENT_CODE
+            != PROGRAMMER_START_UPLOAD_EVENT_CODE
         {
-            return Err(RossConvertPacketError::EventPacket(
-                RossEventPacketError::WrongEventType,
+            return Err(ConvertPacketError::EventPacket(
+                EventPacketError::WrongEventType,
             ));
         }
 
@@ -94,7 +94,7 @@ impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUp
         let new_firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
         let firmware_size = u32::from_be_bytes(packet.data[8..=11].try_into().unwrap());
 
-        Ok(RossProgrammerStartUploadEvent {
+        Ok(ProgrammerStartUploadEvent {
             receiver_address,
             programmer_address,
             new_firmware_version,
@@ -102,10 +102,10 @@ impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUp
         })
     }
 
-    fn to_packet(&self) -> RossPacket {
+    fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(ROSS_PROGRAMMER_START_UPLOAD_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(PROGRAMMER_START_UPLOAD_EVENT_CODE).iter() {
             data.push(*byte);
         }
 
@@ -121,7 +121,7 @@ impl RossConvertPacket<RossProgrammerStartUploadEvent> for RossProgrammerStartUp
             data.push(*byte);
         }
 
-        RossPacket {
+        Packet {
             is_error: false,
             device_address: self.receiver_address,
             data,

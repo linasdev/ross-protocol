@@ -3,35 +3,35 @@ use alloc::collections::BTreeMap;
 use alloc::vec;
 use alloc::vec::Vec;
 
-use crate::ross_convert_packet::RossConvertPacket;
-use crate::ross_interface::*;
-use crate::ross_packet::RossPacket;
+use crate::convert_packet::ConvertPacket;
+use crate::interface::*;
+use crate::packet::Packet;
 
 pub const BROADCAST_ADDRESS: u16 = 0xffff;
 
 #[derive(Debug)]
-pub enum RossProtocolError {
-    InterfaceError(RossInterfaceError),
+pub enum ProtocolError {
+    InterfaceError(InterfaceError),
     NoSuchHandler,
     PacketTimeout,
 }
 
-pub struct RossProtocol<'a, I: RossInterface> {
+pub struct Protocol<'a, I: Interface> {
     device_address: u16,
     interface: I,
-    handlers: BTreeMap<u32, (Box<dyn FnMut(&RossPacket, &mut I) + 'a>, bool)>,
+    handlers: BTreeMap<u32, (Box<dyn FnMut(&Packet, &mut I) + 'a>, bool)>,
 }
 
-impl<'a, I: RossInterface> RossProtocol<'a, I> {
+impl<'a, I: Interface> Protocol<'a, I> {
     pub fn new(device_address: u16, interface: I) -> Self {
-        RossProtocol {
+        Protocol {
             device_address,
             interface,
             handlers: BTreeMap::new(),
         }
     }
 
-    pub fn tick(&mut self) -> Result<(), RossProtocolError> {
+    pub fn tick(&mut self) -> Result<(), ProtocolError> {
         match self.interface.try_get_packet() {
             Ok(packet) => {
                 if packet.device_address == self.device_address
@@ -45,24 +45,24 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
                 Ok(())
             }
             Err(err) => match err {
-                RossInterfaceError::NoPacketReceived => Ok(()),
-                _ => Err(RossProtocolError::InterfaceError(err)),
+                InterfaceError::NoPacketReceived => Ok(()),
+                _ => Err(ProtocolError::InterfaceError(err)),
             },
         }
     }
 
-    pub fn send_packet(&mut self, packet: &RossPacket) -> Result<(), RossProtocolError> {
+    pub fn send_packet(&mut self, packet: &Packet) -> Result<(), ProtocolError> {
         match self.interface.try_send_packet(packet) {
             Ok(_) => Ok(()),
-            Err(err) => Err(RossProtocolError::InterfaceError(err)),
+            Err(err) => Err(ProtocolError::InterfaceError(err)),
         }
     }
 
     pub fn add_packet_handler<'s>(
         &'s mut self,
-        handler: Box<dyn FnMut(&RossPacket, &mut I) + 'a>,
+        handler: Box<dyn FnMut(&Packet, &mut I) + 'a>,
         capture_all_addresses: bool,
-    ) -> Result<u32, RossProtocolError> {
+    ) -> Result<u32, ProtocolError> {
         let id = self.get_next_handler_id();
 
         self.handlers.insert(id, (handler, capture_all_addresses));
@@ -70,20 +70,20 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
         Ok(id)
     }
 
-    pub fn remove_packet_handler(&mut self, id: u32) -> Result<(), RossProtocolError> {
+    pub fn remove_packet_handler(&mut self, id: u32) -> Result<(), ProtocolError> {
         match self.handlers.remove(&id) {
-            None => Err(RossProtocolError::NoSuchHandler),
+            None => Err(ProtocolError::NoSuchHandler),
             Some(_) => Ok(()),
         }
     }
 
-    pub fn exchange_packet<F: Fn(), R: RossConvertPacket<R>>(
+    pub fn exchange_packet<F: Fn(), R: ConvertPacket<R>>(
         &mut self,
-        packet: RossPacket,
+        packet: Packet,
         capture_all_addresses: bool,
         retry_count: u32,
         wait_closure: F,
-    ) -> Result<R, RossProtocolError> {
+    ) -> Result<R, ProtocolError> {
         for _ in 0..retry_count {
             self.send_packet(&packet)?;
 
@@ -102,23 +102,23 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
                         }
                     }
                     Err(err) => match err {
-                        RossInterfaceError::NoPacketReceived => break,
-                        _ => return Err(RossProtocolError::InterfaceError(err)),
+                        InterfaceError::NoPacketReceived => break,
+                        _ => return Err(ProtocolError::InterfaceError(err)),
                     },
                 }
             }
         }
 
-        Err(RossProtocolError::PacketTimeout)
+        Err(ProtocolError::PacketTimeout)
     }
 
-    pub fn exchange_packets<F: Fn(), R: RossConvertPacket<R>>(
+    pub fn exchange_packets<F: Fn(), R: ConvertPacket<R>>(
         &mut self,
-        packet: RossPacket,
+        packet: Packet,
         capture_all_addresses: bool,
         retry_count: u32,
         wait_closure: F,
-    ) -> Result<Vec<R>, RossProtocolError> {
+    ) -> Result<Vec<R>, ProtocolError> {
         let mut events = vec![];
 
         for _ in 0..retry_count {
@@ -139,8 +139,8 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
                         }
                     }
                     Err(err) => match err {
-                        RossInterfaceError::NoPacketReceived => break,
-                        _ => return Err(RossProtocolError::InterfaceError(err)),
+                        InterfaceError::NoPacketReceived => break,
+                        _ => return Err(ProtocolError::InterfaceError(err)),
                     },
                 }
             }
@@ -149,7 +149,7 @@ impl<'a, I: RossInterface> RossProtocol<'a, I> {
         return Ok(events);
     }
 
-    fn handle_packet(&mut self, packet: &RossPacket, owned_address: bool) {
+    fn handle_packet(&mut self, packet: &Packet, owned_address: bool) {
         for handler in self.handlers.values_mut() {
             if owned_address || handler.1 {
                 handler.0(packet, &mut self.interface);

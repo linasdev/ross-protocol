@@ -1,10 +1,10 @@
 use alloc::vec;
 use alloc::vec::Vec;
 
-use crate::ross_frame::{RossFrame, RossFrameId};
+use crate::frame::{Frame, FrameId};
 
 #[derive(Debug, PartialEq)]
-pub struct RossPacket {
+pub struct Packet {
     /// If this flag is set, the packet is considered to be an error packet
     pub is_error: bool,
     /// Transmitting device's address
@@ -13,8 +13,8 @@ pub struct RossPacket {
     pub data: Vec<u8>,
 }
 
-impl RossPacket {
-    pub fn to_frames(&self) -> Vec<RossFrame> {
+impl Packet {
+    pub fn to_frames(&self) -> Vec<Frame> {
         if self.data.len() <= 8 {
             let mut data = [0; 8];
 
@@ -22,11 +22,11 @@ impl RossPacket {
                 data[i] = self.data[i];
             }
 
-            return vec![RossFrame {
+            return vec![Frame {
                 not_error_flag: !self.is_error,
                 start_frame_flag: true,
                 multi_frame_flag: false,
-                frame_id: RossFrameId::LastFrameId(0),
+                frame_id: FrameId::LastFrameId(0),
                 device_address: self.device_address,
                 data_len: self.data.len() as u8,
                 data,
@@ -59,14 +59,14 @@ impl RossPacket {
                 data[j + 1] = self.data[i * 7 + j];
             }
 
-            frames.push(RossFrame {
+            frames.push(Frame {
                 not_error_flag: !self.is_error,
                 start_frame_flag: i == 0,
                 multi_frame_flag: true,
                 frame_id: if i == 0 {
-                    RossFrameId::LastFrameId(frame_count as u16 - 1)
+                    FrameId::LastFrameId(frame_count as u16 - 1)
                 } else {
-                    RossFrameId::CurrentFrameId(i as u16)
+                    FrameId::CurrentFrameId(i as u16)
                 },
                 device_address: self.device_address,
                 data_len: data_len as u8,
@@ -79,7 +79,7 @@ impl RossPacket {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum RossPacketBuilderError {
+pub enum PacketBuilderError {
     /// Frame supplied was not the next frame in the sequence+
     OutOfOrder,
     /// Expected a multi frame packet but a single frame packet was given
@@ -95,14 +95,14 @@ pub enum RossPacketBuilderError {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct RossPacketBuilder {
+pub struct PacketBuilder {
     is_error: bool,
     expected_frame_count: u16,
     device_address: u16,
-    frames: Vec<RossFrame>,
+    frames: Vec<Frame>,
 }
 
-impl RossPacketBuilder {
+impl PacketBuilder {
     pub fn expected_frame_count(&self) -> u16 {
         self.expected_frame_count
     }
@@ -115,18 +115,18 @@ impl RossPacketBuilder {
         self.expected_frame_count() - self.frame_count()
     }
 
-    pub fn new(frame: RossFrame) -> Result<Self, RossPacketBuilderError> {
+    pub fn new(frame: Frame) -> Result<Self, PacketBuilderError> {
         if !frame.start_frame_flag {
-            return Err(RossPacketBuilderError::OutOfOrder);
+            return Err(PacketBuilderError::OutOfOrder);
         }
 
-        let expected_frame_count = if let RossFrameId::LastFrameId(last_frame_id) = frame.frame_id {
+        let expected_frame_count = if let FrameId::LastFrameId(last_frame_id) = frame.frame_id {
             last_frame_id + 1
         } else {
-            return Err(RossPacketBuilderError::OutOfOrder);
+            return Err(PacketBuilderError::OutOfOrder);
         };
 
-        Ok(RossPacketBuilder {
+        Ok(PacketBuilder {
             is_error: !frame.not_error_flag,
             expected_frame_count,
             device_address: frame.device_address,
@@ -134,33 +134,33 @@ impl RossPacketBuilder {
         })
     }
 
-    pub fn add_frame(&mut self, frame: RossFrame) -> Result<(), RossPacketBuilderError> {
+    pub fn add_frame(&mut self, frame: Frame) -> Result<(), PacketBuilderError> {
         if !frame.not_error_flag != self.is_error {
-            return Err(RossPacketBuilderError::WrongFrameType);
+            return Err(PacketBuilderError::WrongFrameType);
         }
 
         if frame.device_address != self.device_address {
-            return Err(RossPacketBuilderError::DeviceAddressMismatch);
+            return Err(PacketBuilderError::DeviceAddressMismatch);
         }
 
         if frame.start_frame_flag {
-            return Err(RossPacketBuilderError::OutOfOrder);
+            return Err(PacketBuilderError::OutOfOrder);
         }
 
         if !frame.multi_frame_flag {
-            return Err(RossPacketBuilderError::SingleFramePacket);
+            return Err(PacketBuilderError::SingleFramePacket);
         }
 
-        if let RossFrameId::CurrentFrameId(frame_id) = frame.frame_id {
+        if let FrameId::CurrentFrameId(frame_id) = frame.frame_id {
             if frame_id != self.frames.len() as u16 {
-                return Err(RossPacketBuilderError::OutOfOrder);
+                return Err(PacketBuilderError::OutOfOrder);
             }
 
             if frame_id >= self.expected_frame_count {
-                return Err(RossPacketBuilderError::TooManyFrames);
+                return Err(PacketBuilderError::TooManyFrames);
             }
         } else {
-            return Err(RossPacketBuilderError::OutOfOrder);
+            return Err(PacketBuilderError::OutOfOrder);
         }
 
         self.frames.push(frame);
@@ -168,9 +168,9 @@ impl RossPacketBuilder {
         Ok(())
     }
 
-    pub fn build(&self) -> Result<RossPacket, RossPacketBuilderError> {
+    pub fn build(&self) -> Result<Packet, PacketBuilderError> {
         if self.frames.len() != self.expected_frame_count as usize {
-            return Err(RossPacketBuilderError::MissingFrames);
+            return Err(PacketBuilderError::MissingFrames);
         }
 
         let mut data = vec![];
@@ -183,7 +183,7 @@ impl RossPacketBuilder {
             }
         }
 
-        Ok(RossPacket {
+        Ok(Packet {
             is_error: self.is_error,
             device_address: self.device_address,
             data,

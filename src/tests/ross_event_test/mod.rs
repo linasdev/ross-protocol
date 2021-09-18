@@ -1,4 +1,0 @@
-mod ross_bootloader_event_test;
-mod ross_configurator_event_test;
-mod ross_general_event_test;
-mod ross_programmer_event_test;

@@ -2,31 +2,31 @@ use alloc::vec;
 use embedded_hal::serial::{Read, Write};
 use nb::block;
 
-use crate::ross_frame::*;
-use crate::ross_interface::*;
-use crate::ross_packet::*;
+use crate::frame::*;
+use crate::interface::*;
+use crate::packet::*;
 
 #[derive(Debug, PartialEq)]
-pub enum RossUsartError {
+pub enum UsartError {
     ReadError,
 }
 
-pub struct RossUsart<S: Read<u8> + Write<u8>> {
+pub struct Usart<S: Read<u8> + Write<u8>> {
     serial: S,
-    packet_builder: Option<RossPacketBuilder>,
+    packet_builder: Option<PacketBuilder>,
 }
 
-impl<S: Read<u8> + Write<u8>> RossUsart<S> {
+impl<S: Read<u8> + Write<u8>> Usart<S> {
     pub fn new(serial: S) -> Self {
-        RossUsart {
+        Usart {
             serial,
             packet_builder: None,
         }
     }
 }
 
-impl<S: Read<u8> + Write<u8>> RossInterface for RossUsart<S> {
-    fn try_get_packet(&mut self) -> Result<RossPacket, RossInterfaceError> {
+impl<S: Read<u8> + Write<u8>> Interface for Usart<S> {
+    fn try_get_packet(&mut self) -> Result<Packet, InterfaceError> {
         loop {
             match self.serial.read() {
                 Ok(frame_start) => {
@@ -36,8 +36,8 @@ impl<S: Read<u8> + Write<u8>> RossInterface for RossUsart<S> {
                         let expected_length = match block!(self.serial.read()) {
                             Ok(length) => length,
                             Err(_) => {
-                                return Err(RossInterfaceError::UsartError(
-                                    RossUsartError::ReadError,
+                                return Err(InterfaceError::UsartError(
+                                    UsartError::ReadError,
                                 ))
                             }
                         };
@@ -46,8 +46,8 @@ impl<S: Read<u8> + Write<u8>> RossInterface for RossUsart<S> {
                             match block!(self.serial.read()) {
                                 Ok(byte) => frame.push(byte),
                                 Err(_) => {
-                                    return Err(RossInterfaceError::UsartError(
-                                        RossUsartError::ReadError,
+                                    return Err(InterfaceError::UsartError(
+                                        UsartError::ReadError,
                                     ))
                                 }
                             }
@@ -57,21 +57,21 @@ impl<S: Read<u8> + Write<u8>> RossInterface for RossUsart<S> {
                             }
                         }
 
-                        let ross_frame = match RossFrame::from_usart_frame(frame) {
+                        let ross_frame = match Frame::from_usart_frame(frame) {
                             Ok(frame) => frame,
-                            Err(err) => return Err(RossInterfaceError::FrameError(err)),
+                            Err(err) => return Err(InterfaceError::FrameError(err)),
                         };
 
                         if let Some(ref mut packet_builder) = self.packet_builder {
                             if let Err(err) = packet_builder.add_frame(ross_frame) {
                                 self.packet_builder = None;
 
-                                return Err(RossInterfaceError::BuilderError(err));
+                                return Err(InterfaceError::BuilderError(err));
                             }
                         } else {
-                            self.packet_builder = match RossPacketBuilder::new(ross_frame) {
+                            self.packet_builder = match PacketBuilder::new(ross_frame) {
                                 Ok(builder) => Some(builder),
-                                Err(err) => return Err(RossInterfaceError::BuilderError(err)),
+                                Err(err) => return Err(InterfaceError::BuilderError(err)),
                             };
                         }
 
@@ -79,7 +79,7 @@ impl<S: Read<u8> + Write<u8>> RossInterface for RossUsart<S> {
                             if packet_builder.frames_left() == 0 {
                                 let packet = match packet_builder.build() {
                                     Ok(packet) => packet,
-                                    Err(err) => return Err(RossInterfaceError::BuilderError(err)),
+                                    Err(err) => return Err(InterfaceError::BuilderError(err)),
                                 };
 
                                 self.packet_builder = None;
@@ -93,10 +93,10 @@ impl<S: Read<u8> + Write<u8>> RossInterface for RossUsart<S> {
             }
         }
 
-        Err(RossInterfaceError::NoPacketReceived)
+        Err(InterfaceError::NoPacketReceived)
     }
 
-    fn try_send_packet(&mut self, packet: &RossPacket) -> Result<(), RossInterfaceError> {
+    fn try_send_packet(&mut self, packet: &Packet) -> Result<(), InterfaceError> {
         let frames = packet.to_frames();
 
         for frame in frames {

@@ -1,33 +1,33 @@
 use alloc::vec;
 use core::convert::TryInto;
 
-use crate::ross_convert_packet::{RossConvertPacket, RossConvertPacketError};
-use crate::ross_event::ross_event_code::*;
-use crate::ross_event::ross_event_packet::RossEventPacketError;
-use crate::ross_packet::RossPacket;
+use crate::convert_packet::{ConvertPacket, ConvertPacketError};
+use crate::event::event_code::*;
+use crate::event::event_packet::EventPacketError;
+use crate::packet::Packet;
 
 #[derive(Debug, PartialEq)]
-pub struct RossBootloaderHelloEvent {
+pub struct BootloaderHelloEvent {
     pub programmer_address: u16,
     pub bootloader_address: u16,
     pub firmware_version: u32,
 }
 
-impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
-    fn try_from_packet(packet: &RossPacket) -> Result<Self, RossConvertPacketError> {
+impl ConvertPacket<BootloaderHelloEvent> for BootloaderHelloEvent {
+    fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 8 {
-            return Err(RossConvertPacketError::WrongSize);
+            return Err(ConvertPacketError::WrongSize);
         }
 
         if packet.is_error {
-            return Err(RossConvertPacketError::WrongType);
+            return Err(ConvertPacketError::WrongType);
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != ROSS_BOOTLOADER_HELLO_EVENT_CODE
+            != BOOTLOADER_HELLO_EVENT_CODE
         {
-            return Err(RossConvertPacketError::EventPacket(
-                RossEventPacketError::WrongEventType,
+            return Err(ConvertPacketError::EventPacket(
+                EventPacketError::WrongEventType,
             ));
         }
 
@@ -35,17 +35,17 @@ impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
         let bootloader_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
-        Ok(RossBootloaderHelloEvent {
+        Ok(BootloaderHelloEvent {
             programmer_address,
             bootloader_address,
             firmware_version,
         })
     }
 
-    fn to_packet(&self) -> RossPacket {
+    fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(ROSS_BOOTLOADER_HELLO_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(BOOTLOADER_HELLO_EVENT_CODE).iter() {
             data.push(*byte);
         }
 
@@ -57,7 +57,7 @@ impl RossConvertPacket<RossBootloaderHelloEvent> for RossBootloaderHelloEvent {
             data.push(*byte);
         }
 
-        RossPacket {
+        Packet {
             is_error: false,
             device_address: self.programmer_address,
             data,

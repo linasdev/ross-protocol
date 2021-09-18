@@ -1,50 +1,50 @@
-use bxcan::{Can, Instance};
+use bxcan::{Can as BxCan, Instance};
 use nb::block;
 
-use crate::ross_frame::*;
-use crate::ross_interface::*;
-use crate::ross_packet::*;
+use crate::frame::*;
+use crate::interface::*;
+use crate::packet::*;
 
 #[derive(Debug, PartialEq)]
-pub enum RossCanError {
+pub enum CanError {
     BufferOverrun,
     MailboxFull,
 }
 
-pub struct RossCan<I: Instance> {
-    can: Can<I>,
-    packet_builder: Option<RossPacketBuilder>,
+pub struct Can<I: Instance> {
+    can: BxCan<I>,
+    packet_builder: Option<PacketBuilder>,
 }
 
-impl<I: Instance> RossCan<I> {
-    pub fn new(can: Can<I>) -> Self {
-        RossCan {
+impl<I: Instance> Can<I> {
+    pub fn new(can: BxCan<I>) -> Self {
+        Can {
             can,
             packet_builder: None,
         }
     }
 }
 
-impl<I: Instance> RossInterface for RossCan<I> {
-    fn try_get_packet(&mut self) -> Result<RossPacket, RossInterfaceError> {
+impl<I: Instance> Interface for Can<I> {
+    fn try_get_packet(&mut self) -> Result<Packet, InterfaceError> {
         loop {
             match self.can.receive() {
                 Ok(frame) => {
-                    let ross_frame = match RossFrame::from_bxcan_frame(frame) {
+                    let ross_frame = match Frame::from_bxcan_frame(frame) {
                         Ok(frame) => frame,
-                        Err(err) => return Err(RossInterfaceError::FrameError(err)),
+                        Err(err) => return Err(InterfaceError::FrameError(err)),
                     };
 
                     if let Some(ref mut packet_builder) = self.packet_builder {
                         if let Err(err) = packet_builder.add_frame(ross_frame) {
                             self.packet_builder = None;
 
-                            return Err(RossInterfaceError::BuilderError(err));
+                            return Err(InterfaceError::BuilderError(err));
                         }
                     } else {
-                        self.packet_builder = match RossPacketBuilder::new(ross_frame) {
+                        self.packet_builder = match PacketBuilder::new(ross_frame) {
                             Ok(builder) => Some(builder),
-                            Err(err) => return Err(RossInterfaceError::BuilderError(err)),
+                            Err(err) => return Err(InterfaceError::BuilderError(err)),
                         };
                     }
 
@@ -52,7 +52,7 @@ impl<I: Instance> RossInterface for RossCan<I> {
                         if packet_builder.frames_left() == 0 {
                             let packet = match packet_builder.build() {
                                 Ok(packet) => packet,
-                                Err(err) => return Err(RossInterfaceError::BuilderError(err)),
+                                Err(err) => return Err(InterfaceError::BuilderError(err)),
                             };
 
                             self.packet_builder = None;
@@ -65,15 +65,15 @@ impl<I: Instance> RossInterface for RossCan<I> {
             }
         }
 
-        Err(RossInterfaceError::NoPacketReceived)
+        Err(InterfaceError::NoPacketReceived)
     }
 
-    fn try_send_packet(&mut self, packet: &RossPacket) -> Result<(), RossInterfaceError> {
+    fn try_send_packet(&mut self, packet: &Packet) -> Result<(), InterfaceError> {
         let frames = packet.to_frames();
 
         for frame in frames {
             if let Ok(Some(_)) = block!(self.can.transmit(&frame.to_bxcan_frame())) {
-                return Err(RossInterfaceError::CanError(RossCanError::MailboxFull));
+                return Err(InterfaceError::CanError(CanError::MailboxFull));
             }
         }
 
