@@ -56,6 +56,14 @@ impl<'a, I: Interface> Protocol<'a, I> {
     }
 
     pub fn send_packet(&mut self, packet: &Packet) -> Result<(), ProtocolError> {
+        if packet.device_address == self.device_address
+        || packet.device_address == BROADCAST_ADDRESS
+        {
+            self.handle_packet(&packet, true);
+        } else {
+            self.handle_packet(&packet, false);
+        }
+
         match self.interface.try_send_packet(packet) {
             Ok(_) => Ok(()),
             Err(err) => Err(ProtocolError::InterfaceError(err)),
@@ -165,7 +173,7 @@ impl<'a, I: Interface> Protocol<'a, I> {
         return Ok(events);
     }
 
-    pub fn handle_packet(&mut self, packet: &Packet, owned_address: bool) {
+    fn handle_packet(&mut self, packet: &Packet, owned_address: bool) {
         for handler in self.handlers.values_mut() {
             if owned_address || handler.1 {
                 handler.0(packet, &mut self.interface);
