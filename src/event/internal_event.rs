@@ -1,7 +1,6 @@
 use alloc::vec;
 use core::convert::TryInto;
 
-use crate::protocol::BROADCAST_ADDRESS;
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
 use crate::event::event_packet::EventPacketError;
@@ -9,6 +8,7 @@ use crate::packet::Packet;
 
 #[derive(Debug, PartialEq)]
 pub struct InternalButtonPressedEvent {
+    pub device_address: u16,
     pub index: u8,
 }
 
@@ -28,9 +28,11 @@ impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
             ));
         }
 
+        let device_address = packet.device_address;
         let index = packet.data[2];
 
         Ok(InternalButtonPressedEvent {
+            device_address,
             index,
         })
     }
@@ -46,7 +48,7 @@ impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
 
         Packet {
             is_error: false,
-            device_address: BROADCAST_ADDRESS,
+            device_address: self.device_address,
             data,
         }
     }
@@ -54,6 +56,7 @@ impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
 
 #[derive(Debug, PartialEq)]
 pub struct InternalButtonReleasedEvent {
+    pub device_address: u16,
     pub index: u8,
 }
 
@@ -73,9 +76,11 @@ impl ConvertPacket<InternalButtonReleasedEvent> for InternalButtonReleasedEvent 
             ));
         }
 
+        let device_address = packet.device_address;
         let index = packet.data[2];
 
         Ok(InternalButtonReleasedEvent {
+            device_address,
             index,
         })
     }
@@ -91,7 +96,7 @@ impl ConvertPacket<InternalButtonReleasedEvent> for InternalButtonReleasedEvent 
 
         Packet {
             is_error: false,
-            device_address: BROADCAST_ADDRESS,
+            device_address: self.device_address,
             data,
         }
     }

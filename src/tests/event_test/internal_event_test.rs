@@ -1,7 +1,6 @@
 use alloc::vec;
 use alloc::vec::Vec;
 
-use crate::protocol::BROADCAST_ADDRESS;
 use crate::convert_packet::ConvertPacket;
 use crate::event::internal_event::*;
 use crate::event::event_code::*;
@@ -9,7 +8,7 @@ use crate::packet::Packet;
 
 const EVENT_PACKET: Packet = Packet {
     is_error: false,
-    device_address: BROADCAST_ADDRESS,
+    device_address: 0xabab,
     data: Vec::new(),
 };
 
@@ -24,12 +23,14 @@ fn try_from_packet_internal_button_pressed_event_test() {
 
     let internal_button_pressed_event = InternalButtonPressedEvent::try_from_packet(&packet).unwrap();
 
+    assert_eq!(internal_button_pressed_event.device_address, 0xabab);
     assert_eq!(internal_button_pressed_event.index, 0x01);
 }
 
 #[test]
 fn to_packet_internal_button_pressed_event_test() {
     let internal_button_pressed_event = InternalButtonPressedEvent {
+        device_address: 0xabab,
         index: 0x01,
     };
 
@@ -54,12 +55,14 @@ fn try_from_packet_internal_button_released_event_test() {
 
     let internal_button_released_event = InternalButtonReleasedEvent::try_from_packet(&packet).unwrap();
 
+    assert_eq!(internal_button_released_event.device_address, 0xabab);
     assert_eq!(internal_button_released_event.index, 0x01);
 }
 
 #[test]
 fn to_packet_internal_button_released_event_test() {
     let internal_button_released_event = InternalButtonReleasedEvent {
+        device_address: 0xabab,
         index: 0x01,
     };
 
