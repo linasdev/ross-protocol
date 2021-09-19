@@ -5,3 +5,4 @@ pub mod event_code;
 pub mod event_packet;
 pub mod general_event;
 pub mod programmer_event;
+pub mod internal_event;
