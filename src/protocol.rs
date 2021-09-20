@@ -1,9 +1,11 @@
+#![allow(mutable_transmutes)]
 #[cfg(feature = "std")]
 use std::io::ErrorKind;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::vec;
 use alloc::vec::Vec;
+use core::mem::transmute;
 
 #[cfg(feature = "std")]
 use crate::interface::serial::SerialError;
@@ -23,7 +25,7 @@ pub enum ProtocolError {
 pub struct Protocol<'a, I: Interface> {
     device_address: u16,
     interface: I,
-    handlers: BTreeMap<u32, (Box<dyn FnMut(&Packet, &mut I) + 'a>, bool)>,
+    handlers: BTreeMap<u32, (Box<dyn FnMut(&Packet, &mut Self) + 'a>, bool)>,
 }
 
 impl<'a, I: Interface> Protocol<'a, I> {
@@ -70,7 +72,7 @@ impl<'a, I: Interface> Protocol<'a, I> {
 
     pub fn add_packet_handler<'s>(
         &'s mut self,
-        handler: Box<dyn FnMut(&Packet, &mut I) + 'a>,
+        handler: Box<dyn FnMut(&Packet, &mut Self) + 'a>,
         capture_all_addresses: bool,
     ) -> Result<u32, ProtocolError> {
         let id = self.get_next_handler_id();
@@ -171,10 +173,12 @@ impl<'a, I: Interface> Protocol<'a, I> {
         return Ok(events);
     }
 
-    fn handle_packet(&mut self, packet: &Packet, owned_address: bool) {
-        for handler in self.handlers.values_mut() {
-            if owned_address || handler.1 {
-                handler.0(packet, &mut self.interface);
+    fn handle_packet(&self, packet: &Packet, owned_address: bool) {
+        unsafe {
+            for handler in transmute::<&Self, &mut Self>(self).handlers.values_mut() {
+                if owned_address || handler.1 {
+                    handler.0(packet, transmute(self));
+                }
             }
         }
     }
