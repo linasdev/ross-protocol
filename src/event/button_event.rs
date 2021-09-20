@@ -8,13 +8,14 @@ use crate::packet::Packet;
 
 #[derive(Debug, PartialEq)]
 pub struct ButtonPressedEvent {
-    pub device_address: u16,
+    pub receiver_address: u16,
+    pub button_address: u16,
     pub index: u8,
 }
 
 impl ConvertPacket<ButtonPressedEvent> for ButtonPressedEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 3 {
+        if packet.data.len() != 5 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -28,11 +29,13 @@ impl ConvertPacket<ButtonPressedEvent> for ButtonPressedEvent {
             ));
         }
 
-        let device_address = packet.device_address;
-        let index = packet.data[2];
+        let receiver_address = packet.device_address;
+        let button_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let index = packet.data[4];
 
         Ok(ButtonPressedEvent {
-            device_address,
+            receiver_address,
+            button_address,
             index,
         })
     }
@@ -44,11 +47,15 @@ impl ConvertPacket<ButtonPressedEvent> for ButtonPressedEvent {
             data.push(*byte);
         }
 
+        for byte in u16::to_be_bytes(self.button_address).iter() {
+            data.push(*byte);
+        }
+
         data.push(self.index);
 
         Packet {
             is_error: false,
-            device_address: self.device_address,
+            device_address: self.receiver_address,
             data,
         }
     }
@@ -56,13 +63,14 @@ impl ConvertPacket<ButtonPressedEvent> for ButtonPressedEvent {
 
 #[derive(Debug, PartialEq)]
 pub struct ButtonReleasedEvent {
-    pub device_address: u16,
+    pub receiver_address: u16,
+    pub button_address: u16,
     pub index: u8,
 }
 
 impl ConvertPacket<ButtonReleasedEvent> for ButtonReleasedEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 3 {
+        if packet.data.len() != 5 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -76,11 +84,13 @@ impl ConvertPacket<ButtonReleasedEvent> for ButtonReleasedEvent {
             ));
         }
 
-        let device_address = packet.device_address;
-        let index = packet.data[2];
+        let receiver_address = packet.device_address;
+        let button_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let index = packet.data[4];
 
         Ok(ButtonReleasedEvent {
-            device_address,
+            receiver_address,
+            button_address,
             index,
         })
     }
@@ -92,11 +102,15 @@ impl ConvertPacket<ButtonReleasedEvent> for ButtonReleasedEvent {
             data.push(*byte);
         }
 
+        for byte in u16::to_be_bytes(self.button_address).iter() {
+            data.push(*byte);
+        }
+
         data.push(self.index);
 
         Packet {
             is_error: false,
-            device_address: self.device_address,
+            device_address: self.receiver_address,
             data,
         }
     }
