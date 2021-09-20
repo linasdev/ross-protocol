@@ -4,13 +4,13 @@ pub mod configurator_event;
 pub mod event_code;
 pub mod general_event;
 pub mod programmer_event;
-pub mod internal_event;
+pub mod button_event;
 
 use crate::event::bootloader_event::*;
 use crate::event::general_event::*;
 use crate::event::programmer_event::*;
 use crate::event::bcm_event::*;
-use crate::event::internal_event::*;
+use crate::event::button_event::*;
 
 #[derive(Debug, PartialEq)]
 pub enum EventError {
@@ -30,6 +30,6 @@ pub enum Event {
 
     BcmChangeBrightness(BcmChangeBrightnessEvent),
 
-    InternalButtonPressed(InternalButtonPressedEvent),
-    InternalButtonReleased(InternalButtonReleasedEvent),
+    ButtonPressed(ButtonPressedEvent),
+    ButtonReleased(ButtonReleasedEvent),
 }

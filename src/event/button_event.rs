@@ -7,12 +7,12 @@ use crate::event::EventError;
 use crate::packet::Packet;
 
 #[derive(Debug, PartialEq)]
-pub struct InternalButtonPressedEvent {
+pub struct ButtonPressedEvent {
     pub device_address: u16,
     pub index: u8,
 }
 
-impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
+impl ConvertPacket<ButtonPressedEvent> for ButtonPressedEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 3 {
             return Err(ConvertPacketError::WrongSize);
@@ -22,7 +22,7 @@ impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != INTERNAL_BUTTON_PRESSED_EVENT_CODE {
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BUTTON_PRESSED_EVENT_CODE {
             return Err(ConvertPacketError::Event(
                 EventError::WrongEventType,
             ));
@@ -31,7 +31,7 @@ impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
         let device_address = packet.device_address;
         let index = packet.data[2];
 
-        Ok(InternalButtonPressedEvent {
+        Ok(ButtonPressedEvent {
             device_address,
             index,
         })
@@ -40,7 +40,7 @@ impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
     fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(INTERNAL_BUTTON_PRESSED_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(BUTTON_PRESSED_EVENT_CODE).iter() {
             data.push(*byte);
         }
 
@@ -55,12 +55,12 @@ impl ConvertPacket<InternalButtonPressedEvent> for InternalButtonPressedEvent {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct InternalButtonReleasedEvent {
+pub struct ButtonReleasedEvent {
     pub device_address: u16,
     pub index: u8,
 }
 
-impl ConvertPacket<InternalButtonReleasedEvent> for InternalButtonReleasedEvent {
+impl ConvertPacket<ButtonReleasedEvent> for ButtonReleasedEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 3 {
             return Err(ConvertPacketError::WrongSize);
@@ -70,7 +70,7 @@ impl ConvertPacket<InternalButtonReleasedEvent> for InternalButtonReleasedEvent 
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != INTERNAL_BUTTON_RELEASED_EVENT_CODE {
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BUTTON_RELEASED_EVENT_CODE {
             return Err(ConvertPacketError::Event(
                 EventError::WrongEventType,
             ));
@@ -79,7 +79,7 @@ impl ConvertPacket<InternalButtonReleasedEvent> for InternalButtonReleasedEvent 
         let device_address = packet.device_address;
         let index = packet.data[2];
 
-        Ok(InternalButtonReleasedEvent {
+        Ok(ButtonReleasedEvent {
             device_address,
             index,
         })
@@ -88,7 +88,7 @@ impl ConvertPacket<InternalButtonReleasedEvent> for InternalButtonReleasedEvent 
     fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(INTERNAL_BUTTON_RELEASED_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(BUTTON_RELEASED_EVENT_CODE).iter() {
             data.push(*byte);
         }
 
