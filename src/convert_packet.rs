@@ -1,4 +1,4 @@
-use crate::event::event_packet::EventPacketError;
+use crate::event::EventError;
 use crate::packet::Packet;
 
 #[derive(Debug, PartialEq)]
@@ -7,8 +7,8 @@ pub enum ConvertPacketError {
     WrongSize,
     /// The provided packet was of a wrong type
     WrongType,
-    /// Event packet specific error
-    EventPacket(EventPacketError),
+    /// Event specific error
+    Event(EventError),
 }
 
 pub trait ConvertPacket<T> {

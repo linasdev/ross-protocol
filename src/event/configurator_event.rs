@@ -3,7 +3,7 @@ use core::convert::TryInto;
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
-use crate::event::event_packet::EventPacketError;
+use crate::event::EventError;
 use crate::packet::Packet;
 use crate::protocol::BROADCAST_ADDRESS;
 
@@ -23,8 +23,8 @@ impl ConvertPacket<ConfiguratorHelloEvent> for ConfiguratorHelloEvent {
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
             != CONFIGURATOR_HELLO_EVENT_CODE
         {
-            return Err(ConvertPacketError::EventPacket(
-                EventPacketError::WrongEventType,
+            return Err(ConvertPacketError::Event(
+                EventError::WrongEventType,
             ));
         }
 

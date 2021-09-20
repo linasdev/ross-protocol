@@ -3,7 +3,7 @@ use core::convert::TryInto;
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
-use crate::event::event_packet::EventPacketError;
+use crate::event::EventError;
 use crate::packet::Packet;
 
 #[derive(Debug, PartialEq)]
@@ -26,8 +26,8 @@ impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BCM_CHANGE_BRIGHTNESS_EVENT_CODE
         {
-            return Err(ConvertPacketError::EventPacket(
-                EventPacketError::WrongEventType,
+            return Err(ConvertPacketError::Event(
+                EventError::WrongEventType,
             ));
         }
 
