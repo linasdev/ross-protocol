@@ -23,9 +23,7 @@ impl ConvertPacket<ConfiguratorHelloEvent> for ConfiguratorHelloEvent {
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
             != CONFIGURATOR_HELLO_EVENT_CODE
         {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         Ok(ConfiguratorHelloEvent {})

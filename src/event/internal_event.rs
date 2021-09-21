@@ -21,17 +21,15 @@ impl ConvertPacket<SystemTickEvent> for SystemTickEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != INTERNAL_SYSTEM_TICK_EVENT_CODE {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
+            != INTERNAL_SYSTEM_TICK_EVENT_CODE
+        {
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let receiver_address = packet.device_address;
 
-        Ok(SystemTickEvent {
-            receiver_address,
-        })
+        Ok(SystemTickEvent { receiver_address })
     }
 
     fn to_packet(&self) -> Packet {

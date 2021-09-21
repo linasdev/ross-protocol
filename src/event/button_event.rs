@@ -24,9 +24,7 @@ impl ConvertPacket<ButtonPressedEvent> for ButtonPressedEvent {
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BUTTON_PRESSED_EVENT_CODE {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let receiver_address = packet.device_address;
@@ -78,10 +76,9 @@ impl ConvertPacket<ButtonReleasedEvent> for ButtonReleasedEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BUTTON_RELEASED_EVENT_CODE {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BUTTON_RELEASED_EVENT_CODE
+        {
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let receiver_address = packet.device_address;

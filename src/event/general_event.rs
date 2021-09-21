@@ -24,9 +24,7 @@ impl ConvertPacket<AckEvent> for AckEvent {
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != ACK_EVENT_CODE {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let receiver_address = packet.device_address;
@@ -72,9 +70,7 @@ impl ConvertPacket<DataEvent> for DataEvent {
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != DATA_EVENT_CODE {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let receiver_address = packet.device_address;

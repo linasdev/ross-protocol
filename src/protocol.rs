@@ -1,15 +1,15 @@
 #![allow(mutable_transmutes)]
-#[cfg(feature = "std")]
-use std::io::ErrorKind;
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::mem::transmute;
+#[cfg(feature = "std")]
+use std::io::ErrorKind;
 
+use crate::convert_packet::ConvertPacket;
 #[cfg(feature = "std")]
 use crate::interface::serial::SerialError;
-use crate::convert_packet::ConvertPacket;
 use crate::interface::*;
 use crate::packet::Packet;
 
@@ -58,8 +58,7 @@ impl<'a, I: Interface> Protocol<'a, I> {
     }
 
     pub fn send_packet(&mut self, packet: &Packet) -> Result<(), ProtocolError> {
-        if packet.device_address == self.device_address
-        {
+        if packet.device_address == self.device_address {
             self.handle_packet(&packet, true);
             Ok(())
         } else {
@@ -120,7 +119,7 @@ impl<'a, I: Interface> Protocol<'a, I> {
                             if let ErrorKind::TimedOut = err.kind() {
                                 break;
                             }
-                        },
+                        }
                         _ => return Err(ProtocolError::InterfaceError(err)),
                     },
                 }
@@ -163,7 +162,7 @@ impl<'a, I: Interface> Protocol<'a, I> {
                             if let ErrorKind::TimedOut = err.kind() {
                                 break;
                             }
-                        },
+                        }
                         _ => return Err(ProtocolError::InterfaceError(err)),
                     },
                 }

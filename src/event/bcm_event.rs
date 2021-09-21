@@ -24,11 +24,10 @@ impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BCM_CHANGE_BRIGHTNESS_EVENT_CODE
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
+            != BCM_CHANGE_BRIGHTNESS_EVENT_CODE
         {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let bcm_address = packet.device_address;

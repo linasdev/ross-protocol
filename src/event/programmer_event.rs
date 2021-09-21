@@ -25,9 +25,7 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != PROGRAMMER_HELLO_EVENT_CODE
         {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
@@ -83,9 +81,7 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
             != PROGRAMMER_START_UPLOAD_EVENT_CODE
         {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let receiver_address = packet.device_address;

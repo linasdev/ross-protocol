@@ -25,9 +25,7 @@ impl ConvertPacket<BootloaderHelloEvent> for BootloaderHelloEvent {
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != BOOTLOADER_HELLO_EVENT_CODE
         {
-            return Err(ConvertPacketError::Event(
-                EventError::WrongEventType,
-            ));
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
         let programmer_address = packet.device_address;
