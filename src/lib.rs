@@ -10,4 +10,4 @@ pub mod packet;
 pub mod protocol;
 
 #[cfg(test)]
-mod tests;
+mod test;
