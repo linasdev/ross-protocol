@@ -26,11 +26,11 @@ fn try_from_packet_bootloader_hello_event_test() {
         0x67,                                              // firmware_version
     ];
 
-    let bootloader_hello_event = BootloaderHelloEvent::try_from_packet(&packet).unwrap();
+    let event = BootloaderHelloEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(bootloader_hello_event.programmer_address, 0xabab);
-    assert_eq!(bootloader_hello_event.bootloader_address, 0x0123);
-    assert_eq!(bootloader_hello_event.firmware_version, 0x01234567);
+    assert_eq!(event.programmer_address, 0xabab);
+    assert_eq!(event.bootloader_address, 0x0123);
+    assert_eq!(event.firmware_version, 0x01234567);
 }
 
 #[test]
@@ -91,7 +91,7 @@ fn try_from_packet_bootloader_hello_event_wrong_event_type_test() {
 
 #[test]
 fn to_packet_bootloader_hello_event_test() {
-    let bootloader_hello_event = BootloaderHelloEvent {
+    let event = BootloaderHelloEvent {
         programmer_address: 0xabab,
         bootloader_address: 0x0123,
         firmware_version: 0x01234567,
@@ -109,5 +109,5 @@ fn to_packet_bootloader_hello_event_test() {
         0x67,                                              // firmware_version
     ];
 
-    assert_eq!(bootloader_hello_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }

@@ -28,10 +28,10 @@ fn try_from_packet_programmer_hello_event_test() {
         0x67,                                              // firmware_version
     ];
 
-    let programmer_hello_event = ProgrammerHelloEvent::try_from_packet(&packet).unwrap();
+    let event = ProgrammerHelloEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(programmer_hello_event.programmer_address, 0x0123);
-    assert_eq!(programmer_hello_event.firmware_version, 0x01234567);
+    assert_eq!(event.programmer_address, 0x0123);
+    assert_eq!(event.firmware_version, 0x01234567);
 }
 
 #[test]
@@ -92,7 +92,7 @@ fn try_from_packet_programmer_hello_event_wrong_event_type_test() {
 
 #[test]
 fn to_packet_programmer_hello_event_test() {
-    let programmer_hello_event = ProgrammerHelloEvent {
+    let event = ProgrammerHelloEvent {
         programmer_address: 0x0123,
         firmware_version: 0x01234567,
     };
@@ -110,7 +110,7 @@ fn to_packet_programmer_hello_event_test() {
         0x67,                                              // firmware_version
     ];
 
-    assert_eq!(programmer_hello_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }
 
 #[test]
@@ -131,21 +131,17 @@ fn try_from_packet_programmer_start_upload_event_test() {
         0x67,                                                     // firmware_size
     ];
 
-    let programmer_start_upload_event =
-        ProgrammerStartUploadEvent::try_from_packet(&packet).unwrap();
+    let event = ProgrammerStartUploadEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(programmer_start_upload_event.receiver_address, 0xabab);
-    assert_eq!(programmer_start_upload_event.programmer_address, 0x0123);
-    assert_eq!(
-        programmer_start_upload_event.new_firmware_version,
-        0x01234567
-    );
-    assert_eq!(programmer_start_upload_event.firmware_size, 0x01234567);
+    assert_eq!(event.receiver_address, 0xabab);
+    assert_eq!(event.programmer_address, 0x0123);
+    assert_eq!(event.new_firmware_version, 0x01234567);
+    assert_eq!(event.firmware_size, 0x01234567);
 }
 
 #[test]
 fn to_packet_programmer_start_upload_event_test() {
-    let programmer_start_upload_event = ProgrammerStartUploadEvent {
+    let event = ProgrammerStartUploadEvent {
         receiver_address: 0xabab,
         programmer_address: 0x0123,
         new_firmware_version: 0x01234567,
@@ -168,7 +164,7 @@ fn to_packet_programmer_start_upload_event_test() {
         0x67,                                                     // firmware_size
     ];
 
-    assert_eq!(programmer_start_upload_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }
 
 #[test]
@@ -185,17 +181,16 @@ fn try_from_packet_programmer_start_event_processor_upload_event_test() {
         0x67,                                                                     // data_len
     ];
 
-    let programmer_start_upload_event =
-        ProgrammerStartEventProcessorUploadEvent::try_from_packet(&packet).unwrap();
+    let event = ProgrammerStartEventProcessorUploadEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(programmer_start_upload_event.receiver_address, 0xabab);
-    assert_eq!(programmer_start_upload_event.programmer_address, 0x0123);
-    assert_eq!(programmer_start_upload_event.data_len, 0x01234567);
+    assert_eq!(event.receiver_address, 0xabab);
+    assert_eq!(event.programmer_address, 0x0123);
+    assert_eq!(event.data_len, 0x01234567);
 }
 
 #[test]
 fn to_packet_programmer_start_event_processor_upload_event_test() {
-    let programmer_start_event_processor_upload_event = ProgrammerStartEventProcessorUploadEvent {
+    let event = ProgrammerStartEventProcessorUploadEvent {
         receiver_address: 0xabab,
         programmer_address: 0x0123,
         data_len: 0x01234567,
@@ -213,5 +208,5 @@ fn to_packet_programmer_start_event_processor_upload_event_test() {
         0x67,                                                                     // data_len
     ];
 
-    assert_eq!(programmer_start_event_processor_upload_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }

@@ -26,7 +26,7 @@ fn try_from_packet_configurator_hello_event_test() {
 
 #[test]
 fn to_packet_configurator_hello_event_test() {
-    let configurator_hello_event = ConfiguratorHelloEvent {};
+    let event = ConfiguratorHelloEvent {};
 
     let mut packet = EVENT_PACKET;
     packet.device_address = BROADCAST_ADDRESS;
@@ -35,5 +35,5 @@ fn to_packet_configurator_hello_event_test() {
         ((CONFIGURATOR_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
     ];
 
-    assert_eq!(configurator_hello_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }

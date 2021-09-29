@@ -22,15 +22,15 @@ fn try_from_packet_ack_event_test() {
         0x23,                                 // transmitter_address
     ];
 
-    let ack_event = AckEvent::try_from_packet(&packet).unwrap();
+    let event = AckEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(ack_event.receiver_address, 0xabab);
-    assert_eq!(ack_event.transmitter_address, 0x0123);
+    assert_eq!(event.receiver_address, 0xabab);
+    assert_eq!(event.transmitter_address, 0x0123);
 }
 
 #[test]
 fn to_packet_ack_event_test() {
-    let ack_event = AckEvent {
+    let event = AckEvent {
         receiver_address: 0xabab,
         transmitter_address: 0x0123,
     };
@@ -43,7 +43,7 @@ fn to_packet_ack_event_test() {
         0x23,                                 // transmitter_address
     ];
 
-    assert_eq!(ack_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }
 
 #[test]
@@ -63,17 +63,17 @@ fn try_from_packet_data_event_test() {
         0x04,                                  // data
     ];
 
-    let data_event = DataEvent::try_from_packet(&packet).unwrap();
+    let event = DataEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(data_event.receiver_address, 0xabab);
-    assert_eq!(data_event.transmitter_address, 0x0123);
-    assert_eq!(data_event.data_len, 0x0005);
-    assert_eq!(data_event.data, vec!(0x00, 0x01, 0x02, 0x03, 0x04));
+    assert_eq!(event.receiver_address, 0xabab);
+    assert_eq!(event.transmitter_address, 0x0123);
+    assert_eq!(event.data_len, 0x0005);
+    assert_eq!(event.data, vec!(0x00, 0x01, 0x02, 0x03, 0x04));
 }
 
 #[test]
 fn to_packet_data_event_test() {
-    let data_event = DataEvent {
+    let event = DataEvent {
         receiver_address: 0xabab,
         transmitter_address: 0x0123,
         data_len: 0x0005,
@@ -95,5 +95,5 @@ fn to_packet_data_event_test() {
         0x04,                                  // data
     ];
 
-    assert_eq!(data_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }

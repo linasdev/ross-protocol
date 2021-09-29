@@ -20,14 +20,14 @@ fn try_from_packet_ack_event_test() {
         ((INTERNAL_SYSTEM_TICK_EVENT_CODE >> 0) & 0xff) as u8, // event code
     ];
 
-    let system_tick_event = SystemTickEvent::try_from_packet(&packet).unwrap();
+    let event = SystemTickEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(system_tick_event.receiver_address, 0xabab);
+    assert_eq!(event.receiver_address, 0xabab);
 }
 
 #[test]
 fn to_packet_ack_event_test() {
-    let system_tick_event = SystemTickEvent {
+    let event = SystemTickEvent {
         receiver_address: 0xabab,
     };
 
@@ -37,5 +37,5 @@ fn to_packet_ack_event_test() {
         ((INTERNAL_SYSTEM_TICK_EVENT_CODE >> 0) & 0xff) as u8, // event code
     ];
 
-    assert_eq!(system_tick_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }

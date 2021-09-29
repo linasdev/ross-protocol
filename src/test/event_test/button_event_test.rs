@@ -23,16 +23,16 @@ fn try_from_packet_button_pressed_event_test() {
         0x45,                                            // index
     ];
 
-    let button_pressed_event = ButtonPressedEvent::try_from_packet(&packet).unwrap();
+    let event = ButtonPressedEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(button_pressed_event.receiver_address, 0xabab);
-    assert_eq!(button_pressed_event.button_address, 0x0123);
-    assert_eq!(button_pressed_event.index, 0x45);
+    assert_eq!(event.receiver_address, 0xabab);
+    assert_eq!(event.button_address, 0x0123);
+    assert_eq!(event.index, 0x45);
 }
 
 #[test]
 fn to_packet_button_pressed_event_test() {
-    let button_pressed_event = ButtonPressedEvent {
+    let event = ButtonPressedEvent {
         receiver_address: 0xabab,
         button_address: 0x0123,
         index: 0x45,
@@ -47,7 +47,7 @@ fn to_packet_button_pressed_event_test() {
         0x45,                                            // index
     ];
 
-    assert_eq!(button_pressed_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }
 
 #[test]
@@ -61,16 +61,16 @@ fn try_from_packet_button_released_event_test() {
         0x45,                                             // index
     ];
 
-    let button_released_event = ButtonReleasedEvent::try_from_packet(&packet).unwrap();
+    let event = ButtonReleasedEvent::try_from_packet(&packet).unwrap();
 
-    assert_eq!(button_released_event.receiver_address, 0xabab);
-    assert_eq!(button_released_event.button_address, 0x0123);
-    assert_eq!(button_released_event.index, 0x45);
+    assert_eq!(event.receiver_address, 0xabab);
+    assert_eq!(event.button_address, 0x0123);
+    assert_eq!(event.index, 0x45);
 }
 
 #[test]
 fn to_packet_button_released_event_test() {
-    let button_released_event = ButtonReleasedEvent {
+    let event = ButtonReleasedEvent {
         receiver_address: 0xabab,
         button_address: 0x0123,
         index: 0x45,
@@ -85,5 +85,5 @@ fn to_packet_button_released_event_test() {
         0x45,                                             // index
     ];
 
-    assert_eq!(button_released_event.to_packet(), packet);
+    assert_eq!(event.to_packet(), packet);
 }
