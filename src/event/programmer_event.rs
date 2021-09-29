@@ -123,3 +123,60 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
         }
     }
 }
+
+#[derive(Debug, PartialEq)]
+pub struct ProgrammerStartEventProcessorUploadEvent {
+    pub receiver_address: u16,
+    pub programmer_address: u16,
+    pub data_len: u32,
+}
+
+impl ConvertPacket<ProgrammerStartEventProcessorUploadEvent> for ProgrammerStartEventProcessorUploadEvent {
+    fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
+        if packet.data.len() != 8 {
+            return Err(ConvertPacketError::WrongSize);
+        }
+
+        if packet.is_error {
+            return Err(ConvertPacketError::WrongType);
+        }
+
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
+            != PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE
+        {
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
+        }
+
+        let receiver_address = packet.device_address;
+        let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let data_len = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
+
+        Ok(ProgrammerStartEventProcessorUploadEvent {
+            receiver_address,
+            programmer_address,
+            data_len,
+        })
+    }
+
+    fn to_packet(&self) -> Packet {
+        let mut data = vec![];
+
+        for byte in u16::to_be_bytes(PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u16::to_be_bytes(self.programmer_address).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u32::to_be_bytes(self.data_len).iter() {
+            data.push(*byte);
+        }
+
+        Packet {
+            is_error: false,
+            device_address: self.receiver_address,
+            data,
+        }
+    }
+}

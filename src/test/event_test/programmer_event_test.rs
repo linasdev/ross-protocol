@@ -170,3 +170,48 @@ fn to_packet_programmer_start_upload_event_test() {
 
     assert_eq!(programmer_start_upload_event.to_packet(), packet);
 }
+
+#[test]
+fn try_from_packet_programmer_start_event_processor_upload_event_test() {
+    let mut packet = EVENT_PACKET;
+    packet.data = vec![
+        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                                     // programmer_address
+        0x23,                                                                     // programmer_address
+        0x01,                                                                     // data_len
+        0x23,                                                                     // data_len
+        0x45,                                                                     // data_len
+        0x67,                                                                     // data_len
+    ];
+
+    let programmer_start_upload_event =
+        ProgrammerStartEventProcessorUploadEvent::try_from_packet(&packet).unwrap();
+
+    assert_eq!(programmer_start_upload_event.receiver_address, 0xabab);
+    assert_eq!(programmer_start_upload_event.programmer_address, 0x0123);
+    assert_eq!(programmer_start_upload_event.data_len, 0x01234567);
+}
+
+#[test]
+fn to_packet_programmer_start_event_processor_upload_event_test() {
+    let programmer_start_event_processor_upload_event = ProgrammerStartEventProcessorUploadEvent {
+        receiver_address: 0xabab,
+        programmer_address: 0x0123,
+        data_len: 0x01234567,
+    };
+
+    let mut packet = EVENT_PACKET;
+    packet.data = vec![
+        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                                     // programmer_address
+        0x23,                                                                     // programmer_address
+        0x01,                                                                     // data_len
+        0x23,                                                                     // data_len
+        0x45,                                                                     // data_len
+        0x67,                                                                     // data_len
+    ];
+
+    assert_eq!(programmer_start_event_processor_upload_event.to_packet(), packet);
+}
