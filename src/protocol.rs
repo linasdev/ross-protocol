@@ -60,12 +60,15 @@ impl<'a, I: Interface> Protocol<'a, I> {
     pub fn send_packet(&mut self, packet: &Packet) -> Result<(), ProtocolError> {
         if packet.device_address == self.device_address {
             self.handle_packet(&packet, true);
-            Ok(())
-        } else {
-            match self.interface.try_send_packet(packet) {
-                Ok(_) => Ok(()),
-                Err(err) => Err(ProtocolError::InterfaceError(err)),
+            
+            if self.device_address != BROADCAST_ADDRESS {
+                return Ok(());
             }
+        }
+
+        match self.interface.try_send_packet(packet) {
+            Ok(_) => Ok(()),
+            Err(err) => Err(ProtocolError::InterfaceError(err)),
         }
     }
 
