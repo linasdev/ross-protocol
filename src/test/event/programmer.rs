@@ -178,3 +178,43 @@ fn to_packet_programmer_start_config_upgrade_event_test() {
 
     assert_eq!(event.to_packet(), packet);
 }
+
+#[test]
+fn try_from_packet_programmer_set_device_address_event_test() {
+    let mut packet = EVENT_PACKET;
+    packet.data = vec![
+        ((PROGRAMMER_SET_DEVICE_ADDRESS_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_SET_DEVICE_ADDRESS_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                           // programmer_address
+        0x23,                                                           // programmer_address
+        0x01,                                                           // new_address
+        0x23,                                                           // new_address
+    ];
+
+    let event = ProgrammerSetDeviceAddressEvent::try_from_packet(&packet).unwrap();
+
+    assert_eq!(event.receiver_address, 0xabab);
+    assert_eq!(event.programmer_address, 0x0123);
+    assert_eq!(event.new_address, 0x0123);
+}
+
+#[test]
+fn to_packet_programmer_set_device_address_event_test() {
+    let event = ProgrammerSetDeviceAddressEvent {
+        receiver_address: 0xabab,
+        programmer_address: 0x0123,
+        new_address: 0x0123,
+    };
+
+    let mut packet = EVENT_PACKET;
+    packet.data = vec![
+        ((PROGRAMMER_SET_DEVICE_ADDRESS_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_SET_DEVICE_ADDRESS_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                           // programmer_address
+        0x23,                                                           // programmer_address
+        0x01,                                                           // new_address
+        0x23,                                                           // new_address
+    ];
+
+    assert_eq!(event.to_packet(), packet);
+}

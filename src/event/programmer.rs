@@ -164,3 +164,60 @@ impl ConvertPacket<ProgrammerStartConfigUpgradeEvent> for ProgrammerStartConfigU
         }
     }
 }
+
+#[derive(Debug, PartialEq)]
+pub struct ProgrammerSetDeviceAddressEvent {
+    pub receiver_address: u16,
+    pub programmer_address: u16,
+    pub new_address: u16,
+}
+
+impl ConvertPacket<ProgrammerSetDeviceAddressEvent> for ProgrammerSetDeviceAddressEvent {
+    fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
+        if packet.data.len() != 6 {
+            return Err(ConvertPacketError::WrongSize);
+        }
+
+        if packet.is_error {
+            return Err(ConvertPacketError::WrongType);
+        }
+
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
+            != PROGRAMMER_SET_DEVICE_ADDRESS_EVENT_CODE
+        {
+            return Err(ConvertPacketError::Event(EventError::WrongEventType));
+        }
+
+        let receiver_address = packet.device_address;
+        let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
+        let new_address = u16::from_be_bytes(packet.data[4..=5].try_into().unwrap());
+
+        Ok(ProgrammerSetDeviceAddressEvent {
+            receiver_address,
+            programmer_address,
+            new_address,
+        })
+    }
+
+    fn to_packet(&self) -> Packet {
+        let mut data = vec![];
+
+        for byte in u16::to_be_bytes(PROGRAMMER_SET_DEVICE_ADDRESS_EVENT_CODE).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u16::to_be_bytes(self.programmer_address).iter() {
+            data.push(*byte);
+        }
+
+        for byte in u16::to_be_bytes(self.new_address).iter() {
+            data.push(*byte);
+        }
+
+        Packet {
+            is_error: false,
+            device_address: self.receiver_address,
+            data,
+        }
+    }
+}
