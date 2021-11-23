@@ -1,3 +1,3 @@
-mod event_test;
-mod frame_test;
-mod packet_test;
+mod event;
+mod frame;
+mod packet;
