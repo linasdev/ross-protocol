@@ -10,12 +10,11 @@ use crate::protocol::BROADCAST_ADDRESS;
 #[derive(Debug, PartialEq)]
 pub struct ProgrammerHelloEvent {
     pub programmer_address: u16,
-    pub firmware_version: u32,
 }
 
 impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 8 {
+        if packet.data.len() != 4 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -29,11 +28,9 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
         }
 
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
-        let firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
         Ok(ProgrammerHelloEvent {
             programmer_address,
-            firmware_version,
         })
     }
 
@@ -45,10 +42,6 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
         }
 
         for byte in u16::to_be_bytes(self.programmer_address).iter() {
-            data.push(*byte);
-        }
-
-        for byte in u32::to_be_bytes(self.firmware_version).iter() {
             data.push(*byte);
         }
 
@@ -64,13 +57,12 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
 pub struct ProgrammerStartUploadEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
-    pub new_firmware_version: u32,
     pub firmware_size: u32,
 }
 
 impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 12 {
+        if packet.data.len() != 8 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -86,13 +78,11 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
 
         let receiver_address = packet.device_address;
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
-        let new_firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
-        let firmware_size = u32::from_be_bytes(packet.data[8..=11].try_into().unwrap());
+        let firmware_size = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
         Ok(ProgrammerStartUploadEvent {
             receiver_address,
             programmer_address,
-            new_firmware_version,
             firmware_size,
         })
     }
@@ -105,10 +95,6 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
         }
 
         for byte in u16::to_be_bytes(self.programmer_address).iter() {
-            data.push(*byte);
-        }
-
-        for byte in u32::to_be_bytes(self.new_firmware_version).iter() {
             data.push(*byte);
         }
 

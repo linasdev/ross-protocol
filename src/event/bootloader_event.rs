@@ -10,12 +10,11 @@ use crate::packet::Packet;
 pub struct BootloaderHelloEvent {
     pub programmer_address: u16,
     pub bootloader_address: u16,
-    pub firmware_version: u32,
 }
 
 impl ConvertPacket<BootloaderHelloEvent> for BootloaderHelloEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 8 {
+        if packet.data.len() != 4 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -30,12 +29,10 @@ impl ConvertPacket<BootloaderHelloEvent> for BootloaderHelloEvent {
 
         let programmer_address = packet.device_address;
         let bootloader_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
-        let firmware_version = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
         Ok(BootloaderHelloEvent {
             programmer_address,
             bootloader_address,
-            firmware_version,
         })
     }
 
@@ -47,10 +44,6 @@ impl ConvertPacket<BootloaderHelloEvent> for BootloaderHelloEvent {
         }
 
         for byte in u16::to_be_bytes(self.bootloader_address).iter() {
-            data.push(*byte);
-        }
-
-        for byte in u32::to_be_bytes(self.firmware_version).iter() {
             data.push(*byte);
         }
 

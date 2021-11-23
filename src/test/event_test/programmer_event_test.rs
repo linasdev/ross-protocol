@@ -22,16 +22,11 @@ fn try_from_packet_programmer_hello_event_test() {
         ((PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01,                                              // programmer_address
         0x23,                                              // programmer_address
-        0x01,                                              // firmware_version
-        0x23,                                              // firmware_version
-        0x45,                                              // firmware_version
-        0x67,                                              // firmware_version
     ];
 
     let event = ProgrammerHelloEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(event.programmer_address, 0x0123);
-    assert_eq!(event.firmware_version, 0x01234567);
 }
 
 #[test]
@@ -43,10 +38,6 @@ fn try_from_packet_programmer_hello_event_wrong_size_test() {
         ((PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01,                                              // programmer_address
         0x34,                                              // programmer_address
-        0x01,                                              // firmware_version
-        0x23,                                              // firmware_version
-        0x45,                                              // firmware_version
-        0x67,                                              // firmware_version
         0x00,                                              // extra byte
     ];
 
@@ -62,10 +53,6 @@ fn try_from_packet_programmer_hello_event_wrong_type_test() {
         ((PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01,                                              // programmer_address
         0x34,                                              // programmer_address
-        0x01,                                              // firmware_version
-        0x23,                                              // firmware_version
-        0x45,                                              // firmware_version
-        0x67,                                              // firmware_version
     ];
     packet.is_error = true;
 
@@ -81,10 +68,6 @@ fn try_from_packet_programmer_hello_event_wrong_event_type_test() {
         ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01,                                              // bootloader_address
         0x23,                                              // bootloader_address
-        0x01,                                              // firmware_version
-        0x23,                                              // firmware_version
-        0x45,                                              // firmware_version
-        0x67,                                              // firmware_version
     ];
 
     ProgrammerHelloEvent::try_from_packet(&packet).unwrap();
@@ -94,7 +77,6 @@ fn try_from_packet_programmer_hello_event_wrong_event_type_test() {
 fn to_packet_programmer_hello_event_test() {
     let event = ProgrammerHelloEvent {
         programmer_address: 0x0123,
-        firmware_version: 0x01234567,
     };
 
     let mut packet = EVENT_PACKET;
@@ -104,10 +86,6 @@ fn to_packet_programmer_hello_event_test() {
         ((PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01,                                              // programmer_address
         0x23,                                              // programmer_address
-        0x01,                                              // firmware_version
-        0x23,                                              // firmware_version
-        0x45,                                              // firmware_version
-        0x67,                                              // firmware_version
     ];
 
     assert_eq!(event.to_packet(), packet);
@@ -121,10 +99,6 @@ fn try_from_packet_programmer_start_upload_event_test() {
         ((PROGRAMMER_START_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01,                                                     // programmer_address
         0x23,                                                     // programmer_address
-        0x01,                                                     // new_firmware_version
-        0x23,                                                     // new_firmware_version
-        0x45,                                                     // new_firmware_version
-        0x67,                                                     // new_firmware_version
         0x01,                                                     // firmware_size
         0x23,                                                     // firmware_size
         0x45,                                                     // firmware_size
@@ -135,7 +109,6 @@ fn try_from_packet_programmer_start_upload_event_test() {
 
     assert_eq!(event.receiver_address, 0xabab);
     assert_eq!(event.programmer_address, 0x0123);
-    assert_eq!(event.new_firmware_version, 0x01234567);
     assert_eq!(event.firmware_size, 0x01234567);
 }
 
@@ -144,7 +117,6 @@ fn to_packet_programmer_start_upload_event_test() {
     let event = ProgrammerStartUploadEvent {
         receiver_address: 0xabab,
         programmer_address: 0x0123,
-        new_firmware_version: 0x01234567,
         firmware_size: 0x01234567,
     };
 
@@ -154,10 +126,6 @@ fn to_packet_programmer_start_upload_event_test() {
         ((PROGRAMMER_START_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
         0x01,                                                     // programmer_address
         0x23,                                                     // programmer_address
-        0x01,                                                     // new_firmware_version
-        0x23,                                                     // new_firmware_version
-        0x45,                                                     // new_firmware_version
-        0x67,                                                     // new_firmware_version
         0x01,                                                     // firmware_size
         0x23,                                                     // firmware_size
         0x45,                                                     // firmware_size
