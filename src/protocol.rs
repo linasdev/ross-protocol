@@ -60,7 +60,7 @@ impl<'a, I: Interface> Protocol<'a, I> {
     pub fn send_packet(&mut self, packet: &Packet) -> Result<(), ProtocolError> {
         if packet.device_address == self.device_address {
             self.handle_packet(&packet, true);
-            
+
             if self.device_address != BROADCAST_ADDRESS {
                 return Ok(());
             }

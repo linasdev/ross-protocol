@@ -29,9 +29,7 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
 
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
 
-        Ok(ProgrammerHelloEvent {
-            programmer_address,
-        })
+        Ok(ProgrammerHelloEvent { programmer_address })
     }
 
     fn to_packet(&self) -> Packet {
