@@ -153,7 +153,7 @@ fn try_from_packet_programmer_start_config_upgrade_event_test() {
 
     assert_eq!(event.receiver_address, 0xabab);
     assert_eq!(event.programmer_address, 0x0123);
-    assert_eq!(event.data_len, 0x01234567);
+    assert_eq!(event.config_size, 0x01234567);
 }
 
 #[test]
@@ -161,7 +161,7 @@ fn to_packet_programmer_start_config_upgrade_event_test() {
     let event = ProgrammerStartConfigUpgradeEvent {
         receiver_address: 0xabab,
         programmer_address: 0x0123,
-        data_len: 0x01234567,
+        config_size: 0x01234567,
     };
 
     let mut packet = EVENT_PACKET;

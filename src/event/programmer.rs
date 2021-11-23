@@ -112,7 +112,7 @@ impl ConvertPacket<ProgrammerStartFirmwareUpgradeEvent> for ProgrammerStartFirmw
 pub struct ProgrammerStartConfigUpgradeEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
-    pub data_len: u32,
+    pub config_size: u32,
 }
 
 impl ConvertPacket<ProgrammerStartConfigUpgradeEvent> for ProgrammerStartConfigUpgradeEvent {
@@ -133,12 +133,12 @@ impl ConvertPacket<ProgrammerStartConfigUpgradeEvent> for ProgrammerStartConfigU
 
         let receiver_address = packet.device_address;
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
-        let data_len = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
+        let config_size = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
         Ok(ProgrammerStartConfigUpgradeEvent {
             receiver_address,
             programmer_address,
-            data_len,
+            config_size,
         })
     }
 
@@ -153,7 +153,7 @@ impl ConvertPacket<ProgrammerStartConfigUpgradeEvent> for ProgrammerStartConfigU
             data.push(*byte);
         }
 
-        for byte in u32::to_be_bytes(self.data_len).iter() {
+        for byte in u32::to_be_bytes(self.config_size).iter() {
             data.push(*byte);
         }
 
