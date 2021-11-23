@@ -111,13 +111,13 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct ProgrammerStartEventProcessorUploadEvent {
+pub struct ProgrammerStartConfigUploadEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
     pub data_len: u32,
 }
 
-impl ConvertPacket<ProgrammerStartEventProcessorUploadEvent> for ProgrammerStartEventProcessorUploadEvent {
+impl ConvertPacket<ProgrammerStartConfigUploadEvent> for ProgrammerStartConfigUploadEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 8 {
             return Err(ConvertPacketError::WrongSize);
@@ -128,7 +128,7 @@ impl ConvertPacket<ProgrammerStartEventProcessorUploadEvent> for ProgrammerStart
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE
+            != PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE
         {
             return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
@@ -137,7 +137,7 @@ impl ConvertPacket<ProgrammerStartEventProcessorUploadEvent> for ProgrammerStart
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let data_len = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
-        Ok(ProgrammerStartEventProcessorUploadEvent {
+        Ok(ProgrammerStartConfigUploadEvent {
             receiver_address,
             programmer_address,
             data_len,
@@ -147,7 +147,7 @@ impl ConvertPacket<ProgrammerStartEventProcessorUploadEvent> for ProgrammerStart
     fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE).iter() {
             data.push(*byte);
         }
 

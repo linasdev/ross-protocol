@@ -136,20 +136,20 @@ fn to_packet_programmer_start_upload_event_test() {
 }
 
 #[test]
-fn try_from_packet_programmer_start_event_processor_upload_event_test() {
+fn try_from_packet_programmer_start_config_upload_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
-        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                                     // programmer_address
-        0x23,                                                                     // programmer_address
-        0x01,                                                                     // data_len
-        0x23,                                                                     // data_len
-        0x45,                                                                     // data_len
-        0x67,                                                                     // data_len
+        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                            // programmer_address
+        0x23,                                                            // programmer_address
+        0x01,                                                            // data_len
+        0x23,                                                            // data_len
+        0x45,                                                            // data_len
+        0x67,                                                            // data_len
     ];
 
-    let event = ProgrammerStartEventProcessorUploadEvent::try_from_packet(&packet).unwrap();
+    let event = ProgrammerStartConfigUploadEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(event.receiver_address, 0xabab);
     assert_eq!(event.programmer_address, 0x0123);
@@ -157,8 +157,8 @@ fn try_from_packet_programmer_start_event_processor_upload_event_test() {
 }
 
 #[test]
-fn to_packet_programmer_start_event_processor_upload_event_test() {
-    let event = ProgrammerStartEventProcessorUploadEvent {
+fn to_packet_programmer_start_config_upload_event_test() {
+    let event = ProgrammerStartConfigUploadEvent {
         receiver_address: 0xabab,
         programmer_address: 0x0123,
         data_len: 0x01234567,
@@ -166,14 +166,14 @@ fn to_packet_programmer_start_event_processor_upload_event_test() {
 
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
-        ((PROGRAMMER_START_EVENT_PROCESSOR_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                                     // programmer_address
-        0x23,                                                                     // programmer_address
-        0x01,                                                                     // data_len
-        0x23,                                                                     // data_len
-        0x45,                                                                     // data_len
-        0x67,                                                                     // data_len
+        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                            // programmer_address
+        0x23,                                                            // programmer_address
+        0x01,                                                            // data_len
+        0x23,                                                            // data_len
+        0x45,                                                            // data_len
+        0x67,                                                            // data_len
     ];
 
     assert_eq!(event.to_packet(), packet);
