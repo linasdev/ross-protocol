@@ -1,11 +1,11 @@
-pub mod bcm_event;
-pub mod bootloader_event;
-pub mod button_event;
-pub mod configurator_event;
+pub mod bcm;
+pub mod bootloader;
+pub mod button;
+pub mod configurator;
 pub mod event_code;
-pub mod general_event;
-pub mod internal_event;
-pub mod programmer_event;
+pub mod general;
+pub mod internal;
+pub mod programmer;
 
 #[derive(Debug, PartialEq)]
 pub enum EventError {

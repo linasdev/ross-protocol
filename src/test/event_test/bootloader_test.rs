@@ -2,7 +2,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 use crate::convert_packet::ConvertPacket;
-use crate::event::bootloader_event::*;
+use crate::event::bootloader::*;
 use crate::event::event_code::*;
 use crate::packet::Packet;
 

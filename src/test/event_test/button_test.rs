@@ -2,7 +2,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 use crate::convert_packet::ConvertPacket;
-use crate::event::button_event::*;
+use crate::event::button::*;
 use crate::event::event_code::*;
 use crate::packet::Packet;
 

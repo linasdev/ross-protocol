@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 
 use crate::convert_packet::ConvertPacket;
 use crate::event::event_code::*;
-use crate::event::general_event::*;
+use crate::event::general::*;
 use crate::packet::Packet;
 
 const EVENT_PACKET: Packet = Packet {
