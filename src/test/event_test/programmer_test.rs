@@ -92,20 +92,20 @@ fn to_packet_programmer_hello_event_test() {
 }
 
 #[test]
-fn try_from_packet_programmer_start_upload_event_test() {
+fn try_from_packet_programmer_start_firmware_upgrade_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        ((PROGRAMMER_START_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
-        ((PROGRAMMER_START_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                     // programmer_address
-        0x23,                                                     // programmer_address
-        0x01,                                                     // firmware_size
-        0x23,                                                     // firmware_size
-        0x45,                                                     // firmware_size
-        0x67,                                                     // firmware_size
+        ((PROGRAMMER_START_FIRMWARE_UPGRADE_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_FIRMWARE_UPGRADE_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                               // programmer_address
+        0x23,                                                               // programmer_address
+        0x01,                                                               // firmware_size
+        0x23,                                                               // firmware_size
+        0x45,                                                               // firmware_size
+        0x67,                                                               // firmware_size
     ];
 
-    let event = ProgrammerStartUploadEvent::try_from_packet(&packet).unwrap();
+    let event = ProgrammerStartFirmwareUpgradeEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(event.receiver_address, 0xabab);
     assert_eq!(event.programmer_address, 0x0123);
@@ -113,8 +113,8 @@ fn try_from_packet_programmer_start_upload_event_test() {
 }
 
 #[test]
-fn to_packet_programmer_start_upload_event_test() {
-    let event = ProgrammerStartUploadEvent {
+fn to_packet_programmer_start_firmware_upgrade_event_test() {
+    let event = ProgrammerStartFirmwareUpgradeEvent {
         receiver_address: 0xabab,
         programmer_address: 0x0123,
         firmware_size: 0x01234567,
@@ -122,34 +122,34 @@ fn to_packet_programmer_start_upload_event_test() {
 
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        ((PROGRAMMER_START_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
-        ((PROGRAMMER_START_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                     // programmer_address
-        0x23,                                                     // programmer_address
-        0x01,                                                     // firmware_size
-        0x23,                                                     // firmware_size
-        0x45,                                                     // firmware_size
-        0x67,                                                     // firmware_size
+        ((PROGRAMMER_START_FIRMWARE_UPGRADE_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_FIRMWARE_UPGRADE_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                               // programmer_address
+        0x23,                                                               // programmer_address
+        0x01,                                                               // firmware_size
+        0x23,                                                               // firmware_size
+        0x45,                                                               // firmware_size
+        0x67,                                                               // firmware_size
     ];
 
     assert_eq!(event.to_packet(), packet);
 }
 
 #[test]
-fn try_from_packet_programmer_start_config_upload_event_test() {
+fn try_from_packet_programmer_start_config_upgrade_event_test() {
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
-        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                            // programmer_address
-        0x23,                                                            // programmer_address
-        0x01,                                                            // data_len
-        0x23,                                                            // data_len
-        0x45,                                                            // data_len
-        0x67,                                                            // data_len
+        ((PROGRAMMER_START_CONFIG_UPGRADE_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_CONFIG_UPGRADE_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                             // programmer_address
+        0x23,                                                             // programmer_address
+        0x01,                                                             // data_len
+        0x23,                                                             // data_len
+        0x45,                                                             // data_len
+        0x67,                                                             // data_len
     ];
 
-    let event = ProgrammerStartConfigUploadEvent::try_from_packet(&packet).unwrap();
+    let event = ProgrammerStartConfigUpgradeEvent::try_from_packet(&packet).unwrap();
 
     assert_eq!(event.receiver_address, 0xabab);
     assert_eq!(event.programmer_address, 0x0123);
@@ -157,8 +157,8 @@ fn try_from_packet_programmer_start_config_upload_event_test() {
 }
 
 #[test]
-fn to_packet_programmer_start_config_upload_event_test() {
-    let event = ProgrammerStartConfigUploadEvent {
+fn to_packet_programmer_start_config_upgrade_event_test() {
+    let event = ProgrammerStartConfigUpgradeEvent {
         receiver_address: 0xabab,
         programmer_address: 0x0123,
         data_len: 0x01234567,
@@ -166,14 +166,14 @@ fn to_packet_programmer_start_config_upload_event_test() {
 
     let mut packet = EVENT_PACKET;
     packet.data = vec![
-        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 8) & 0xff) as u8, // event code
-        ((PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE >> 0) & 0xff) as u8, // event code
-        0x01,                                                            // programmer_address
-        0x23,                                                            // programmer_address
-        0x01,                                                            // data_len
-        0x23,                                                            // data_len
-        0x45,                                                            // data_len
-        0x67,                                                            // data_len
+        ((PROGRAMMER_START_CONFIG_UPGRADE_EVENT_CODE >> 8) & 0xff) as u8, // event code
+        ((PROGRAMMER_START_CONFIG_UPGRADE_EVENT_CODE >> 0) & 0xff) as u8, // event code
+        0x01,                                                             // programmer_address
+        0x23,                                                             // programmer_address
+        0x01,                                                             // data_len
+        0x23,                                                             // data_len
+        0x45,                                                             // data_len
+        0x67,                                                             // data_len
     ];
 
     assert_eq!(event.to_packet(), packet);

@@ -52,13 +52,13 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct ProgrammerStartUploadEvent {
+pub struct ProgrammerStartFirmwareUpgradeEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
     pub firmware_size: u32,
 }
 
-impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
+impl ConvertPacket<ProgrammerStartFirmwareUpgradeEvent> for ProgrammerStartFirmwareUpgradeEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 8 {
             return Err(ConvertPacketError::WrongSize);
@@ -69,7 +69,7 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != PROGRAMMER_START_UPLOAD_EVENT_CODE
+            != PROGRAMMER_START_FIRMWARE_UPGRADE_EVENT_CODE
         {
             return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
@@ -78,7 +78,7 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let firmware_size = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
-        Ok(ProgrammerStartUploadEvent {
+        Ok(ProgrammerStartFirmwareUpgradeEvent {
             receiver_address,
             programmer_address,
             firmware_size,
@@ -88,7 +88,7 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
     fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(PROGRAMMER_START_UPLOAD_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(PROGRAMMER_START_FIRMWARE_UPGRADE_EVENT_CODE).iter() {
             data.push(*byte);
         }
 
@@ -109,13 +109,13 @@ impl ConvertPacket<ProgrammerStartUploadEvent> for ProgrammerStartUploadEvent {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct ProgrammerStartConfigUploadEvent {
+pub struct ProgrammerStartConfigUpgradeEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
     pub data_len: u32,
 }
 
-impl ConvertPacket<ProgrammerStartConfigUploadEvent> for ProgrammerStartConfigUploadEvent {
+impl ConvertPacket<ProgrammerStartConfigUpgradeEvent> for ProgrammerStartConfigUpgradeEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
         if packet.data.len() != 8 {
             return Err(ConvertPacketError::WrongSize);
@@ -126,7 +126,7 @@ impl ConvertPacket<ProgrammerStartConfigUploadEvent> for ProgrammerStartConfigUp
         }
 
         if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE
+            != PROGRAMMER_START_CONFIG_UPGRADE_EVENT_CODE
         {
             return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
@@ -135,7 +135,7 @@ impl ConvertPacket<ProgrammerStartConfigUploadEvent> for ProgrammerStartConfigUp
         let programmer_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let data_len = u32::from_be_bytes(packet.data[4..=7].try_into().unwrap());
 
-        Ok(ProgrammerStartConfigUploadEvent {
+        Ok(ProgrammerStartConfigUpgradeEvent {
             receiver_address,
             programmer_address,
             data_len,
@@ -145,7 +145,7 @@ impl ConvertPacket<ProgrammerStartConfigUploadEvent> for ProgrammerStartConfigUp
     fn to_packet(&self) -> Packet {
         let mut data = vec![];
 
-        for byte in u16::to_be_bytes(PROGRAMMER_START_CONFIG_UPLOAD_EVENT_CODE).iter() {
+        for byte in u16::to_be_bytes(PROGRAMMER_START_CONFIG_UPGRADE_EVENT_CODE).iter() {
             data.push(*byte);
         }
 
