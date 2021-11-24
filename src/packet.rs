@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 
 use crate::frame::{Frame, FrameId};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Packet {
     /// If this flag is set, the packet is considered to be an error packet
     pub is_error: bool,
