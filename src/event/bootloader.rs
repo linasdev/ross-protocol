@@ -54,3 +54,92 @@ impl ConvertPacket<BootloaderHelloEvent> for BootloaderHelloEvent {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    const EVENT_PACKET: Packet = Packet {
+        is_error: false,
+        device_address: 0xabab,
+        data: vec![],
+    };
+    
+    #[test]
+    fn try_from_packet_test() {
+        let mut packet = EVENT_PACKET;
+        packet.data = vec![
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
+            0x01, // bootloader address
+            0x23, // bootloader address
+        ];
+    
+        let event = BootloaderHelloEvent::try_from_packet(&packet).unwrap();
+    
+        assert_eq!(event.programmer_address, 0xabab);
+        assert_eq!(event.bootloader_address, 0x0123);
+    }
+    
+    #[test]
+    #[should_panic]
+    fn try_from_packet_wrong_size_test() {
+        let mut packet = EVENT_PACKET;
+        packet.data = vec![
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
+            0x01, // bootloader address
+            0x23, // bootloader address
+            0x00, // extra byte
+        ];
+    
+        BootloaderHelloEvent::try_from_packet(&packet).unwrap();
+    }
+    
+    #[test]
+    #[should_panic]
+    fn try_from_packet_wrong_type_test() {
+        let mut packet = EVENT_PACKET;
+        packet.data = vec![
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
+            0x01, // bootloader address
+            0x23, // bootloader address
+        ];
+        packet.is_error = true;
+    
+        BootloaderHelloEvent::try_from_packet(&packet).unwrap();
+    }
+    
+    #[test]
+    #[should_panic]
+    fn try_from_packet_wrong_event_type_test() {
+        let mut packet = EVENT_PACKET;
+        packet.data = vec![
+            ((PROGRAMMER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+            ((PROGRAMMER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
+            0xab, // programmer address
+            0xab, // programmer address
+        ];
+    
+        BootloaderHelloEvent::try_from_packet(&packet).unwrap();
+    }
+    
+    #[test]
+    fn to_packet_test() {
+        let event = BootloaderHelloEvent {
+            programmer_address: 0xabab,
+            bootloader_address: 0x0123,
+        };
+    
+        let mut packet = EVENT_PACKET;
+        packet.data = vec![
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
+            ((BOOTLOADER_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
+            0x01, // bootloader address
+            0x23, // bootloader address
+        ];
+    
+        assert_eq!(event.to_packet(), packet);
+    }    
+}

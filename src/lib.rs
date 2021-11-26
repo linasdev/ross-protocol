@@ -8,6 +8,3 @@ pub mod frame;
 pub mod interface;
 pub mod packet;
 pub mod protocol;
-
-#[cfg(test)]
-mod test;
