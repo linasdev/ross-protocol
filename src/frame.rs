@@ -237,7 +237,7 @@ impl Frame {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     const FRAME_ID: u32 = 0x1405_5555;
     const FRAME_DATA: [u8; 8] = [0x55; 8];
     const FRAME: Frame = Frame {
@@ -249,23 +249,24 @@ mod tests {
         data_len: 8,
         data: FRAME_DATA,
     };
-    
+
     #[test]
     fn from_bxcan_frame_test() {
         let bxcan_frame = BxFrame::new_data(ExtendedId::new(FRAME_ID).unwrap(), FRAME_DATA);
         let ross_frame = Frame::from_bxcan_frame(bxcan_frame).unwrap();
-    
+
         assert_eq!(ross_frame, FRAME);
     }
-    
+
     #[test]
     fn to_bxcan_frame_test() {
         let bxcan_frame = FRAME.to_bxcan_frame();
-        let bxcan_frame_expected = BxFrame::new_data(ExtendedId::new(FRAME_ID).unwrap(), FRAME_DATA);
-    
+        let bxcan_frame_expected =
+            BxFrame::new_data(ExtendedId::new(FRAME_ID).unwrap(), FRAME_DATA);
+
         assert_eq!(bxcan_frame, bxcan_frame_expected);
     }
-    
+
     #[test]
     fn from_usart_frame_test() {
         let usart_frame = vec![
@@ -284,12 +285,12 @@ mod tests {
             0x55, // data
             0x55, // data
         ];
-    
+
         let ross_frame = Frame::from_usart_frame(usart_frame).unwrap();
-    
+
         assert_eq!(ross_frame, FRAME);
     }
-    
+
     #[test]
     fn to_usart_frame_test() {
         let usart_frame = FRAME.to_usart_frame();
@@ -309,7 +310,7 @@ mod tests {
             0x55, // data
             0x55, // data
         ];
-    
+
         assert_eq!(usart_frame, usart_frame_expected);
-    }    
+    }
 }

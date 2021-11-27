@@ -116,31 +116,31 @@ impl ConvertPacket<ButtonReleasedEvent> for ButtonReleasedEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     const EVENT_PACKET: Packet = Packet {
         is_error: false,
         device_address: 0xabab,
         data: vec![],
     };
-    
+
     #[test]
     fn pressed_try_from_packet_test() {
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((BUTTON_PRESSED_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((BUTTON_PRESSED_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // button address
-            0x23, // button address
-            0x45, // index
+            0x01,                                            // button address
+            0x23,                                            // button address
+            0x45,                                            // index
         ];
-    
+
         let event = ButtonPressedEvent::try_from_packet(&packet).unwrap();
-    
+
         assert_eq!(event.receiver_address, 0xabab);
         assert_eq!(event.button_address, 0x0123);
         assert_eq!(event.index, 0x45);
     }
-    
+
     #[test]
     fn pressed_to_packet_test() {
         let event = ButtonPressedEvent {
@@ -148,37 +148,37 @@ mod tests {
             button_address: 0x0123,
             index: 0x45,
         };
-    
+
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((BUTTON_PRESSED_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((BUTTON_PRESSED_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // button address
-            0x23, // button address
-            0x45, // index
+            0x01,                                            // button address
+            0x23,                                            // button address
+            0x45,                                            // index
         ];
-    
+
         assert_eq!(event.to_packet(), packet);
     }
-    
+
     #[test]
     fn released_try_from_test() {
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((BUTTON_RELEASED_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((BUTTON_RELEASED_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // button address
-            0x23, // button address
-            0x45, // index
+            0x01,                                             // button address
+            0x23,                                             // button address
+            0x45,                                             // index
         ];
-    
+
         let event = ButtonReleasedEvent::try_from_packet(&packet).unwrap();
-    
+
         assert_eq!(event.receiver_address, 0xabab);
         assert_eq!(event.button_address, 0x0123);
         assert_eq!(event.index, 0x45);
     }
-    
+
     #[test]
     fn released_to_packet_test() {
         let event = ButtonReleasedEvent {
@@ -186,16 +186,16 @@ mod tests {
             button_address: 0x0123,
             index: 0x45,
         };
-    
+
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((BUTTON_RELEASED_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((BUTTON_RELEASED_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // button address
-            0x23, // button address
-            0x45, // index
+            0x01,                                             // button address
+            0x23,                                             // button address
+            0x45,                                             // index
         ];
-    
+
         assert_eq!(event.to_packet(), packet);
-    }   
+    }
 }

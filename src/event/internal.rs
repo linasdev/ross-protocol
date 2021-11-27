@@ -56,7 +56,7 @@ mod tests {
         device_address: 0xabab,
         data: vec![],
     };
-    
+
     #[test]
     fn try_from_packet_test() {
         let mut packet = EVENT_PACKET;
@@ -64,24 +64,24 @@ mod tests {
             ((INTERNAL_SYSTEM_TICK_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((INTERNAL_SYSTEM_TICK_EVENT_CODE >> 0) & 0xff) as u8, // event code
         ];
-    
+
         let event = SystemTickEvent::try_from_packet(&packet).unwrap();
-    
+
         assert_eq!(event.receiver_address, 0xabab);
     }
-    
+
     #[test]
     fn to_packet_test() {
         let event = SystemTickEvent {
             receiver_address: 0xabab,
         };
-    
+
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((INTERNAL_SYSTEM_TICK_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((INTERNAL_SYSTEM_TICK_EVENT_CODE >> 0) & 0xff) as u8, // event code
         ];
-    
+
         assert_eq!(event.to_packet(), packet);
-    }    
+    }
 }

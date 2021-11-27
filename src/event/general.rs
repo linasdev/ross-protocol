@@ -125,72 +125,72 @@ impl ConvertPacket<DataEvent> for DataEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     const EVENT_PACKET: Packet = Packet {
         is_error: false,
         device_address: 0xabab,
         data: vec![],
     };
-    
+
     #[test]
     fn ack_try_from_packet_test() {
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((ACK_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((ACK_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // transmitter address
-            0x23, // transmitter address
+            0x01,                                 // transmitter address
+            0x23,                                 // transmitter address
         ];
-    
+
         let event = AckEvent::try_from_packet(&packet).unwrap();
-    
+
         assert_eq!(event.receiver_address, 0xabab);
         assert_eq!(event.transmitter_address, 0x0123);
     }
-    
+
     #[test]
     fn ack_to_packet_test() {
         let event = AckEvent {
             receiver_address: 0xabab,
             transmitter_address: 0x0123,
         };
-    
+
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((ACK_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((ACK_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // transmitter address
-            0x23, // transmitter address
+            0x01,                                 // transmitter address
+            0x23,                                 // transmitter address
         ];
-    
+
         assert_eq!(event.to_packet(), packet);
     }
-    
+
     #[test]
     fn data_try_from_packet_test() {
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // transmitter address
-            0x23, // transmitter address
-            0x00, // data len
-            0x05, // data len
-            0x00, // data
-            0x01, // data
-            0x02, // data
-            0x03, // data
-            0x04, // data
+            0x01,                                  // transmitter address
+            0x23,                                  // transmitter address
+            0x00,                                  // data len
+            0x05,                                  // data len
+            0x00,                                  // data
+            0x01,                                  // data
+            0x02,                                  // data
+            0x03,                                  // data
+            0x04,                                  // data
         ];
-    
+
         let event = DataEvent::try_from_packet(&packet).unwrap();
-    
+
         assert_eq!(event.receiver_address, 0xabab);
         assert_eq!(event.transmitter_address, 0x0123);
         assert_eq!(event.data_len, 0x0005);
         assert_eq!(event.data, vec!(0x00, 0x01, 0x02, 0x03, 0x04));
     }
-    
+
     #[test]
     fn data_to_packet_test() {
         let event = DataEvent {
@@ -199,22 +199,22 @@ mod tests {
             data_len: 0x0005,
             data: vec![0x00, 0x01, 0x02, 0x03, 0x04],
         };
-    
+
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01, // transmitter address
-            0x23, // transmitter address
-            0x00, // data len
-            0x05, // data len
-            0x00, // data
-            0x01, // data
-            0x02, // data
-            0x03, // data
-            0x04, // data
+            0x01,                                  // transmitter address
+            0x23,                                  // transmitter address
+            0x00,                                  // data len
+            0x05,                                  // data len
+            0x00,                                  // data
+            0x01,                                  // data
+            0x02,                                  // data
+            0x03,                                  // data
+            0x04,                                  // data
         ];
-    
+
         assert_eq!(event.to_packet(), packet);
-    }    
+    }
 }

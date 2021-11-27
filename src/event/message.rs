@@ -1,6 +1,6 @@
 use alloc::vec;
 use core::convert::TryInto;
-use core::mem::{transmute_copy, size_of};
+use core::mem::{size_of, transmute_copy};
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
@@ -33,8 +33,7 @@ impl ConvertPacket<MessageEvent> for MessageEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != MESSAGE_EVENT_CODE
-        {
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != MESSAGE_EVENT_CODE {
             return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
@@ -42,7 +41,11 @@ impl ConvertPacket<MessageEvent> for MessageEvent {
         let transmitter_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let code = u16::from_be_bytes(packet.data[4..=5].try_into().unwrap());
         let value = unsafe {
-            transmute_copy::<[u8; size_of::<MessageValue>()], MessageValue>(&packet.data[6..6 + size_of::<MessageValue>()].try_into().unwrap())
+            transmute_copy::<[u8; size_of::<MessageValue>()], MessageValue>(
+                &packet.data[6..6 + size_of::<MessageValue>()]
+                    .try_into()
+                    .unwrap(),
+            )
         };
 
         Ok(Self {
@@ -69,7 +72,9 @@ impl ConvertPacket<MessageEvent> for MessageEvent {
         }
 
         unsafe {
-            for byte in transmute_copy::<MessageValue, [u8; size_of::<MessageValue>()]>(&self.value).iter() {
+            for byte in
+                transmute_copy::<MessageValue, [u8; size_of::<MessageValue>()]>(&self.value).iter()
+            {
                 data.push(*byte);
             }
         }
@@ -85,31 +90,31 @@ impl ConvertPacket<MessageEvent> for MessageEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     const EVENT_PACKET: Packet = Packet {
         is_error: false,
         device_address: 0xabab,
         data: vec![],
     };
-    
+
     #[test]
     fn try_from_packet_test() {
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((MESSAGE_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((MESSAGE_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x00, // transmitter address
-            0x00, // transmitter address
-            0x01, // code
-            0x23, // code
-            0x02, // value
-            0x00, // value
-            0x00, // value
-            0x00, // value
-            0xff, // value
-            0xff, // value
-            0xff, // value
-            0xff, // value
+            0x00,                                     // transmitter address
+            0x00,                                     // transmitter address
+            0x01,                                     // code
+            0x23,                                     // code
+            0x02,                                     // value
+            0x00,                                     // value
+            0x00,                                     // value
+            0x00,                                     // value
+            0xff,                                     // value
+            0xff,                                     // value
+            0xff,                                     // value
+            0xff,                                     // value
         ];
 
         let event = MessageEvent::try_from_packet(&packet).unwrap();
@@ -118,7 +123,7 @@ mod tests {
         assert_eq!(event.transmitter_address, 0x0000);
         assert_eq!(event.code, 0x0123);
     }
-    
+
     #[test]
     fn to_packet_test() {
         let event = MessageEvent {
@@ -127,25 +132,25 @@ mod tests {
             code: 0x0123,
             value: MessageValue::U32(0xffff_ffff),
         };
-    
+
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((MESSAGE_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((MESSAGE_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x00, // transmitter address
-            0x00, // transmitter address
-            0x01, // code
-            0x23, // code
-            0x02, // value
-            0x00, // value
-            0x00, // value
-            0x00, // value
-            0xff, // value
-            0xff, // value
-            0xff, // value
-            0xff, // value
+            0x00,                                     // transmitter address
+            0x00,                                     // transmitter address
+            0x01,                                     // code
+            0x23,                                     // code
+            0x02,                                     // value
+            0x00,                                     // value
+            0x00,                                     // value
+            0x00,                                     // value
+            0xff,                                     // value
+            0xff,                                     // value
+            0xff,                                     // value
+            0xff,                                     // value
         ];
-    
+
         assert_eq!(event.to_packet(), packet);
-    }  
+    }
 }

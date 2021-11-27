@@ -47,13 +47,13 @@ impl ConvertPacket<ConfiguratorHelloEvent> for ConfiguratorHelloEvent {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     const EVENT_PACKET: Packet = Packet {
         is_error: false,
         device_address: 0x0000,
         data: vec![],
     };
-    
+
     #[test]
     fn try_from_packet_test() {
         let mut packet = EVENT_PACKET;
@@ -61,21 +61,21 @@ mod tests {
             ((CONFIGURATOR_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((CONFIGURATOR_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         ];
-    
+
         ConfiguratorHelloEvent::try_from_packet(&packet).unwrap();
     }
-    
+
     #[test]
     fn to_packet_test() {
         let event = ConfiguratorHelloEvent {};
-    
+
         let mut packet = EVENT_PACKET;
         packet.device_address = BROADCAST_ADDRESS;
         packet.data = vec![
             ((CONFIGURATOR_HELLO_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((CONFIGURATOR_HELLO_EVENT_CODE >> 0) & 0xff) as u8, // event code
         ];
-    
+
         assert_eq!(event.to_packet(), packet);
-    }  
+    }
 }

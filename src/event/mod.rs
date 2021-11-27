@@ -5,8 +5,8 @@ pub mod configurator;
 pub mod event_code;
 pub mod general;
 pub mod internal;
-pub mod programmer;
 pub mod message;
+pub mod programmer;
 
 #[derive(Debug, PartialEq)]
 pub enum EventError {
