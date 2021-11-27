@@ -9,6 +9,8 @@ pub enum ConvertPacketError {
     WrongType,
     /// Event specific error
     Event(EventError),
+    /// Postcard error
+    PostcardError(postcard::Error),
 }
 
 pub trait ConvertPacket<T> {

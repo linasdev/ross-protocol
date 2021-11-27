@@ -1,6 +1,6 @@
 use alloc::vec;
+use serde::{Serialize, Deserialize};
 use core::convert::TryInto;
-use core::mem::{size_of, transmute_copy};
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
@@ -8,7 +8,7 @@ use crate::event::EventError;
 use crate::packet::Packet;
 
 #[repr(C)]
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub enum MessageValue {
     U8(u8),
     U16(u16),
@@ -25,7 +25,7 @@ pub struct MessageEvent {
 
 impl ConvertPacket<MessageEvent> for MessageEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 6 + size_of::<MessageValue>() {
+        if packet.data.len() != 11 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -40,13 +40,7 @@ impl ConvertPacket<MessageEvent> for MessageEvent {
         let receiver_address = packet.device_address;
         let transmitter_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let code = u16::from_be_bytes(packet.data[4..=5].try_into().unwrap());
-        let value = unsafe {
-            transmute_copy::<[u8; size_of::<MessageValue>()], MessageValue>(
-                &packet.data[6..6 + size_of::<MessageValue>()]
-                    .try_into()
-                    .unwrap(),
-            )
-        };
+        let value = postcard::from_bytes(&packet.data[6..=10]).map_err(|err| ConvertPacketError::PostcardError(err))?;
 
         Ok(Self {
             receiver_address,
@@ -71,12 +65,10 @@ impl ConvertPacket<MessageEvent> for MessageEvent {
             data.push(*byte);
         }
 
-        unsafe {
-            for byte in
-                transmute_copy::<MessageValue, [u8; size_of::<MessageValue>()]>(&self.value).iter()
-            {
-                data.push(*byte);
-            }
+        let mut value_buffer = [0u8; 5];
+        postcard::to_slice(&self.value, &mut value_buffer).unwrap();
+        for byte in value_buffer.iter() {
+            data.push(*byte);
         }
 
         Packet {
@@ -108,9 +100,6 @@ mod tests {
             0x01,                                     // code
             0x23,                                     // code
             0x02,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
             0xff,                                     // value
             0xff,                                     // value
             0xff,                                     // value
@@ -142,9 +131,6 @@ mod tests {
             0x01,                                     // code
             0x23,                                     // code
             0x02,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
             0xff,                                     // value
             0xff,                                     // value
             0xff,                                     // value
