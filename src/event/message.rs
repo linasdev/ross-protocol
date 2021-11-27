@@ -8,7 +8,7 @@ use crate::event::EventError;
 use crate::packet::Packet;
 
 #[repr(C)]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum MessageValue {
     U8(u8),
     U16(u16),
