@@ -21,16 +21,6 @@ default-features = false
 version = "^4.0.1"
 optional = true
 
-[dependencies.serde]
-version = "1.0.130"
-features = ["alloc"]
-default-features = false
-
-[dependencies.postcard]
-version = "0.7.2"
-features = ["alloc"]
-default-features = false
-
 [features]
 default = []
 std = ["serialport"]
