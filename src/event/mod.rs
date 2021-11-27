@@ -6,6 +6,7 @@ pub mod event_code;
 pub mod general;
 pub mod internal;
 pub mod programmer;
+pub mod message;
 
 #[derive(Debug, PartialEq)]
 pub enum EventError {
