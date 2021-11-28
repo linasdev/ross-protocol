@@ -13,6 +13,7 @@ pub enum MessageValue {
     U8(u8),
     U16(u16),
     U32(u32),
+    Bool(bool),
 }
 
 #[derive(Debug, PartialEq)]
