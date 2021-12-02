@@ -9,20 +9,16 @@ repository = "https://github.com/linasdev/ross-protocol"
 readme = "README.md"
 
 [dependencies]
-bxcan = "^0.4.0"
-nb = "^1.0.0"
-embedded-hal = "^0.2.5"
+bxcan = "0.4.0"
+nb = "1.0.0"
+embedded-hal = "0.2.5"
 
 [dependencies.cobs]
-version = "^0.1.4"
-default-features = false
-
-[dependencies.chrono]
-version = "^0.4.19"
+version = "0.1.4"
 default-features = false
 
 [dependencies.serialport]
-version = "^4.0.1"
+version = "4.0.1"
 optional = true
 
 [features]

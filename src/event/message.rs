@@ -1,7 +1,6 @@
 use alloc::vec;
 use core::convert::TryInto;
 use core::mem::{size_of, transmute_copy};
-use chrono::{DateTime, Utc};
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
@@ -15,7 +14,6 @@ pub enum MessageValue {
     U16(u16),
     U32(u32),
     Bool(bool),
-    DateTime(DateTime<Utc>),
 }
 
 #[derive(Debug, PartialEq)]
@@ -118,14 +116,6 @@ mod tests {
             0xff,                                     // value
             0xff,                                     // value
             0xff,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
         ];
 
         let event = MessageEvent::try_from_packet(&packet).unwrap();
@@ -160,14 +150,6 @@ mod tests {
             0xff,                                     // value
             0xff,                                     // value
             0xff,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
-            0x00,                                     // value
         ];
 
         assert_eq!(event.to_packet(), packet);
