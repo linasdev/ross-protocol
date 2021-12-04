@@ -1,22 +1,31 @@
 use alloc::vec;
 use core::convert::TryInto;
+use core::mem::{size_of, transmute_copy};
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
 use crate::event::EventError;
 use crate::packet::Packet;
 
+#[repr(C)]
+#[derive(Debug, PartialEq, Clone)]
+pub enum BcmValue {
+    Single(u8),
+    Rgb(u8, u8, u8),
+    Rgbw(u8, u8, u8, u8),
+}
+
 #[derive(Debug, PartialEq)]
 pub struct BcmChangeBrightnessEvent {
     pub bcm_address: u16,
     pub transmitter_address: u16,
-    pub channel: u8,
-    pub brightness: u8,
+    pub index: u8,
+    pub value: BcmValue,
 }
 
 impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 6 {
+        if packet.data.len() != 5 + size_of::<BcmValue>() {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -32,14 +41,20 @@ impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
 
         let bcm_address = packet.device_address;
         let transmitter_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
-        let channel = packet.data[4];
-        let brightness = packet.data[5];
+        let index = packet.data[4];
+        let value = unsafe {
+            transmute_copy::<[u8; size_of::<BcmValue>()], BcmValue>(
+                &packet.data[5..5 + size_of::<BcmValue>()]
+                    .try_into()
+                    .unwrap(),
+            )
+        };
 
         Ok(BcmChangeBrightnessEvent {
             bcm_address,
             transmitter_address,
-            channel,
-            brightness,
+            index,
+            value,
         })
     }
 
@@ -54,8 +69,14 @@ impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
             data.push(*byte);
         }
 
-        data.push(self.channel);
-        data.push(self.brightness);
+        data.push(self.index);
+
+        unsafe {
+            for byte in transmute_copy::<BcmValue, [u8; size_of::<BcmValue>()]>(&self.value).iter()
+            {
+                data.push(*byte);
+            }
+        }
 
         Packet {
             is_error: false,
@@ -81,37 +102,51 @@ mod tests {
         packet.data = vec![
             ((BCM_CHANGE_BRIGHTNESS_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((BCM_CHANGE_BRIGHTNESS_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01,                                                   // transmitter address
-            0x23,                                                   // transmitter address
-            0x45,                                                   // channel
-            0x67,                                                   // brightness
+            0x00,                                                   // transmitter address
+            0x00,                                                   // transmitter address
+            0x01,                                                   // index
+            0x01,                                                   // value
+            0x00,                                                   // value
+            0x00,                                                   // value
+            0x00,                                                   // value
+            0x23,                                                   // value
+            0x45,                                                   // value
+            0x67,                                                   // value
+            0x00,                                                   // value
         ];
 
         let event = BcmChangeBrightnessEvent::try_from_packet(&packet).unwrap();
 
         assert_eq!(event.bcm_address, 0xabab);
-        assert_eq!(event.transmitter_address, 0x0123);
-        assert_eq!(event.channel, 0x45);
-        assert_eq!(event.brightness, 0x67);
+        assert_eq!(event.transmitter_address, 0x0000);
+        assert_eq!(event.index, 0x01);
+        assert_eq!(event.value, BcmValue::Rgb(0x23, 0x45, 0x67));
     }
 
     #[test]
     fn to_packet_test() {
         let event = BcmChangeBrightnessEvent {
             bcm_address: 0xabab,
-            transmitter_address: 0x0123,
-            channel: 0x45,
-            brightness: 0x67,
+            transmitter_address: 0x0000,
+            index: 0x01,
+            value: BcmValue::Rgb(0x23, 0x45, 0x67),
         };
 
         let mut packet = EVENT_PACKET;
         packet.data = vec![
             ((BCM_CHANGE_BRIGHTNESS_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((BCM_CHANGE_BRIGHTNESS_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01,                                                   // transmitter address
-            0x23,                                                   // transmitter address
-            0x45,                                                   // channel
-            0x67,                                                   // brightness
+            0x00,                                                   // transmitter address
+            0x00,                                                   // transmitter address
+            0x01,                                                   // index
+            0x01,                                                   // value
+            0x00,                                                   // value
+            0x00,                                                   // value
+            0x00,                                                   // value
+            0x23,                                                   // value
+            0x45,                                                   // value
+            0x67,                                                   // value
+            0x00,                                                   // value
         ];
 
         assert_eq!(event.to_packet(), packet);
