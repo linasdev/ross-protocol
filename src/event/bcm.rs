@@ -8,7 +8,7 @@ use crate::event::EventError;
 use crate::packet::Packet;
 
 #[repr(C)]
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum BcmValue {
     Single(u8),
     Rgb(u8, u8, u8),
