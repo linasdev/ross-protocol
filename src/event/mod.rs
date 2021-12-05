@@ -7,6 +7,7 @@ pub mod general;
 pub mod internal;
 pub mod message;
 pub mod programmer;
+pub mod relay;
 
 #[derive(Debug, PartialEq)]
 pub enum EventError {
