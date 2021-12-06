@@ -7,7 +7,7 @@ use crate::event::EventError;
 use crate::packet::Packet;
 use crate::protocol::BROADCAST_ADDRESS;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct ConfiguratorHelloEvent {}
 
 impl ConvertPacket<ConfiguratorHelloEvent> for ConfiguratorHelloEvent {

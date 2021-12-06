@@ -8,14 +8,14 @@ use crate::event::EventError;
 use crate::packet::Packet;
 
 #[repr(C)]
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum BcmValue {
     Single(u8),
     Rgb(u8, u8, u8),
     Rgbw(u8, u8, u8, u8),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct BcmChangeBrightnessEvent {
     pub bcm_address: u16,
     pub transmitter_address: u16,
@@ -86,7 +86,7 @@ impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct BcmAnimateBrightnessEvent {
     pub bcm_address: u16,
     pub transmitter_address: u16,

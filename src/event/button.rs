@@ -6,7 +6,7 @@ use crate::event::event_code::*;
 use crate::event::EventError;
 use crate::packet::Packet;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct ButtonPressedEvent {
     pub receiver_address: u16,
     pub button_address: u16,
@@ -59,7 +59,7 @@ impl ConvertPacket<ButtonPressedEvent> for ButtonPressedEvent {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct ButtonReleasedEvent {
     pub receiver_address: u16,
     pub button_address: u16,

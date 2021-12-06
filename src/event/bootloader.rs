@@ -6,7 +6,7 @@ use crate::event::event_code::*;
 use crate::event::EventError;
 use crate::packet::Packet;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct BootloaderHelloEvent {
     pub programmer_address: u16,
     pub bootloader_address: u16,

@@ -6,7 +6,7 @@ use crate::event::event_code::*;
 use crate::event::EventError;
 use crate::packet::Packet;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct RelaySetStateEvent {
     pub relay_address: u16,
     pub transmitter_address: u16,
@@ -63,7 +63,7 @@ impl ConvertPacket<RelaySetStateEvent> for RelaySetStateEvent {
         }
     }
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct RelayFlipStateEvent {
     pub relay_address: u16,
     pub transmitter_address: u16,
