@@ -6,7 +6,7 @@ use crate::event::event_code::*;
 use crate::event::EventError;
 use crate::packet::Packet;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct SystemTickEvent {
     pub receiver_address: u16,
 }

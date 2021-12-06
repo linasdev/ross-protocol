@@ -7,7 +7,7 @@ use crate::event::event_code::*;
 use crate::event::EventError;
 use crate::packet::Packet;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct AckEvent {
     pub receiver_address: u16,
     pub transmitter_address: u16,
@@ -55,7 +55,7 @@ impl ConvertPacket<AckEvent> for AckEvent {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct DataEvent {
     pub receiver_address: u16,
     pub transmitter_address: u16,

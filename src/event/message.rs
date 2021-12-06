@@ -8,7 +8,7 @@ use crate::event::EventError;
 use crate::packet::Packet;
 
 #[repr(C)]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum MessageValue {
     U8(u8),
     U16(u16),
@@ -16,7 +16,7 @@ pub enum MessageValue {
     Bool(bool),
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct MessageEvent {
     pub receiver_address: u16,
     pub transmitter_address: u16,

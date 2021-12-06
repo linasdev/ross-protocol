@@ -7,7 +7,7 @@ use crate::event::EventError;
 use crate::packet::Packet;
 use crate::protocol::BROADCAST_ADDRESS;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct ProgrammerHelloEvent {
     pub programmer_address: u16,
 }
@@ -51,7 +51,7 @@ impl ConvertPacket<ProgrammerHelloEvent> for ProgrammerHelloEvent {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct ProgrammerStartFirmwareUpgradeEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
@@ -108,7 +108,7 @@ impl ConvertPacket<ProgrammerStartFirmwareUpgradeEvent> for ProgrammerStartFirmw
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct ProgrammerStartConfigUpgradeEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
@@ -165,7 +165,7 @@ impl ConvertPacket<ProgrammerStartConfigUpgradeEvent> for ProgrammerStartConfigU
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct ProgrammerSetDeviceAddressEvent {
     pub receiver_address: u16,
     pub programmer_address: u16,
