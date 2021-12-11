@@ -1,6 +1,6 @@
 use alloc::vec;
 use core::convert::TryInto;
-use core::mem::{transmute_copy, size_of};
+use core::mem::{size_of, transmute_copy};
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
@@ -78,7 +78,8 @@ impl ConvertPacket<RelaySetValueEvent> for RelaySetValueEvent {
         data.push(self.index);
 
         unsafe {
-            for byte in transmute_copy::<RelayValue, [u8; size_of::<RelayValue>()]>(&self.value).iter()
+            for byte in
+                transmute_copy::<RelayValue, [u8; size_of::<RelayValue>()]>(&self.value).iter()
             {
                 data.push(*byte);
             }
@@ -126,7 +127,10 @@ mod tests {
         assert_eq!(event.relay_address, 0xabab);
         assert_eq!(event.transmitter_address, 0x0123);
         assert_eq!(event.index, 0x45);
-        assert_eq!(event.value, RelayValue::DoubleExclusive(RelayDoubleExclusiveValue::SecondChannelOn));
+        assert_eq!(
+            event.value,
+            RelayValue::DoubleExclusive(RelayDoubleExclusiveValue::SecondChannelOn)
+        );
     }
 
     #[test]
