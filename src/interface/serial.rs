@@ -82,7 +82,7 @@ impl Interface for Serial {
                         }
                     }
                 }
-                Err(err) => return Err(InterfaceError::SerialError(SerialError::ReadError(err))),
+                Err(err) => return Err(InterfaceError::NoPacketReceived),
             }
         }
     }
