@@ -1,17 +1,48 @@
 use alloc::vec;
+use alloc::vec::Vec;
 use core::convert::TryInto;
-use core::mem::{size_of, transmute_copy};
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
 use crate::event::EventError;
 use crate::packet::Packet;
 
-#[repr(C)]
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum RelayValue {
     Single(bool),
     DoubleExclusive(RelayDoubleExclusiveValue),
+}
+
+impl RelayValue {
+    fn serialize(self) -> Vec<u8> {
+        match self {
+            Self::Single(value) => vec![if value { 0x00 } else { 0x01 }],
+            Self::DoubleExclusive(RelayDoubleExclusiveValue::FirstChannelOn) => vec![0x02],
+            Self::DoubleExclusive(RelayDoubleExclusiveValue::SecondChannelOn) => vec![0x03],
+            Self::DoubleExclusive(RelayDoubleExclusiveValue::NoChannelOn) => vec![0x04],
+        }
+    }
+
+    fn deserialize(data: &[u8]) -> Result<Self, ConvertPacketError> {
+        if data.len() != 1 {
+            return Err(ConvertPacketError::WrongSize);
+        }
+
+        match data[0] {
+            0x00 => Ok(Self::Single(true)),
+            0x01 => Ok(Self::Single(false)),
+            0x02 => Ok(Self::DoubleExclusive(
+                RelayDoubleExclusiveValue::FirstChannelOn,
+            )),
+            0x03 => Ok(Self::DoubleExclusive(
+                RelayDoubleExclusiveValue::SecondChannelOn,
+            )),
+            0x04 => Ok(Self::DoubleExclusive(
+                RelayDoubleExclusiveValue::NoChannelOn,
+            )),
+            _ => Err(ConvertPacketError::UnknownEnumVariant),
+        }
+    }
 }
 
 #[repr(C)]
@@ -32,7 +63,7 @@ pub struct RelaySetValueEvent {
 
 impl ConvertPacket<RelaySetValueEvent> for RelaySetValueEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 5 + size_of::<RelayValue>() {
+        if packet.data.len() != 6 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -48,13 +79,7 @@ impl ConvertPacket<RelaySetValueEvent> for RelaySetValueEvent {
         let relay_address = packet.device_address;
         let transmitter_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let index = packet.data[4];
-        let value = unsafe {
-            transmute_copy::<[u8; size_of::<RelayValue>()], RelayValue>(
-                &packet.data[5..5 + size_of::<RelayValue>()]
-                    .try_into()
-                    .unwrap(),
-            )
-        };
+        let value = RelayValue::deserialize(&packet.data[5..])?;
 
         Ok(Self {
             relay_address,
@@ -76,14 +101,7 @@ impl ConvertPacket<RelaySetValueEvent> for RelaySetValueEvent {
         }
 
         data.push(self.index);
-
-        unsafe {
-            for byte in
-                transmute_copy::<RelayValue, [u8; size_of::<RelayValue>()]>(&self.value).iter()
-            {
-                data.push(*byte);
-            }
-        }
+        data.append(&mut self.value.serialize());
 
         Packet {
             is_error: false,
@@ -112,14 +130,7 @@ mod tests {
             0x01,                                             // transmitter address
             0x23,                                             // transmitter address
             0x45,                                             // index
-            0x01,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
-            0x01,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
+            0x03,                                             // value
         ];
 
         let event = RelaySetValueEvent::try_from_packet(&packet).unwrap();
@@ -149,14 +160,7 @@ mod tests {
             0x01,                                             // transmitter address
             0x23,                                             // transmitter address
             0x45,                                             // index
-            0x01,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
-            0x01,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
-            0x00,                                             // value
+            0x03,                                             // value
         ];
 
         assert_eq!(event.to_packet(), packet);
