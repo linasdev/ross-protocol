@@ -1,6 +1,6 @@
 use alloc::vec;
+use alloc::vec::Vec;
 use core::convert::TryInto;
-use core::mem::{size_of, transmute_copy};
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
 use crate::event::event_code::*;
@@ -15,6 +15,47 @@ pub enum BcmValue {
     Rgbw(u8, u8, u8, u8),
 }
 
+impl BcmValue {
+    fn serialize(self) -> Vec<u8> {
+        match self {
+            Self::Single(value) => vec![0x00, value],
+            Self::Rgb(red, green, blue) => vec![0x01, red, green, blue],
+            Self::Rgbw(red, green, blue, white) => vec![0x02, red, green, blue, white],
+        }
+    }
+
+    fn deserialize(data: &[u8]) -> Result<Self, ConvertPacketError> {
+        if data.len() < 2 {
+            return Err(ConvertPacketError::WrongSize);
+        }
+
+        match data[0] {
+            0x00 => {
+                if data.len() != 2 {
+                    return Err(ConvertPacketError::WrongSize);
+                }
+
+                Ok(Self::Single(data[1]))
+            }
+            0x01 => {
+                if data.len() != 4 {
+                    return Err(ConvertPacketError::WrongSize);
+                }
+
+                Ok(Self::Rgb(data[1], data[2], data[3]))
+            }
+            0x02 => {
+                if data.len() != 5 {
+                    return Err(ConvertPacketError::WrongSize);
+                }
+
+                Ok(Self::Rgbw(data[1], data[2], data[3], data[4]))
+            }
+            _ => Err(ConvertPacketError::UnknownEnumVariant),
+        }
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd)]
 pub struct BcmChangeBrightnessEvent {
     pub bcm_address: u16,
@@ -25,7 +66,7 @@ pub struct BcmChangeBrightnessEvent {
 
 impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 5 + size_of::<BcmValue>() {
+        if packet.data.len() < 7 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -42,13 +83,7 @@ impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
         let bcm_address = packet.device_address;
         let transmitter_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let index = packet.data[4];
-        let value = unsafe {
-            transmute_copy::<[u8; size_of::<BcmValue>()], BcmValue>(
-                &packet.data[5..5 + size_of::<BcmValue>()]
-                    .try_into()
-                    .unwrap(),
-            )
-        };
+        let value = BcmValue::deserialize(&packet.data[5..])?;
 
         Ok(BcmChangeBrightnessEvent {
             bcm_address,
@@ -70,13 +105,7 @@ impl ConvertPacket<BcmChangeBrightnessEvent> for BcmChangeBrightnessEvent {
         }
 
         data.push(self.index);
-
-        unsafe {
-            for byte in transmute_copy::<BcmValue, [u8; size_of::<BcmValue>()]>(&self.value).iter()
-            {
-                data.push(*byte);
-            }
-        }
+        data.append(&mut self.value.serialize());
 
         Packet {
             is_error: false,
@@ -97,7 +126,7 @@ pub struct BcmAnimateBrightnessEvent {
 
 impl ConvertPacket<BcmAnimateBrightnessEvent> for BcmAnimateBrightnessEvent {
     fn try_from_packet(packet: &Packet) -> Result<Self, ConvertPacketError> {
-        if packet.data.len() != 9 + size_of::<BcmValue>() {
+        if packet.data.len() < 11 {
             return Err(ConvertPacketError::WrongSize);
         }
 
@@ -115,13 +144,7 @@ impl ConvertPacket<BcmAnimateBrightnessEvent> for BcmAnimateBrightnessEvent {
         let transmitter_address = u16::from_be_bytes(packet.data[2..=3].try_into().unwrap());
         let index = packet.data[4];
         let duration = u32::from_be_bytes(packet.data[5..=8].try_into().unwrap());
-        let target_value = unsafe {
-            transmute_copy::<[u8; size_of::<BcmValue>()], BcmValue>(
-                &packet.data[9..9 + size_of::<BcmValue>()]
-                    .try_into()
-                    .unwrap(),
-            )
-        };
+        let target_value = BcmValue::deserialize(&packet.data[9..])?;
 
         Ok(Self {
             bcm_address,
@@ -149,13 +172,7 @@ impl ConvertPacket<BcmAnimateBrightnessEvent> for BcmAnimateBrightnessEvent {
             data.push(*byte);
         }
 
-        unsafe {
-            for byte in
-                transmute_copy::<BcmValue, [u8; size_of::<BcmValue>()]>(&self.target_value).iter()
-            {
-                data.push(*byte);
-            }
-        }
+        data.append(&mut self.target_value.serialize());
 
         Packet {
             is_error: false,
@@ -185,13 +202,9 @@ mod tests {
             0x00,                                                   // transmitter address
             0x01,                                                   // index
             0x01,                                                   // value
-            0x00,                                                   // value
-            0x00,                                                   // value
-            0x00,                                                   // value
             0x23,                                                   // value
             0x45,                                                   // value
             0x67,                                                   // value
-            0x00,                                                   // value
         ];
 
         let event = BcmChangeBrightnessEvent::try_from_packet(&packet).unwrap();
@@ -219,13 +232,9 @@ mod tests {
             0x00,                                                   // transmitter address
             0x01,                                                   // index
             0x01,                                                   // value
-            0x00,                                                   // value
-            0x00,                                                   // value
-            0x00,                                                   // value
             0x23,                                                   // value
             0x45,                                                   // value
             0x67,                                                   // value
-            0x00,                                                   // value
         ];
 
         assert_eq!(event.to_packet(), packet);
@@ -245,13 +254,9 @@ mod tests {
             0xab,                                                    // duration
             0xab,                                                    // duration
             0x01,                                                    // target value
-            0x00,                                                    // target value
-            0x00,                                                    // target value
-            0x00,                                                    // target value
             0x23,                                                    // target value
             0x45,                                                    // target value
             0x67,                                                    // target value
-            0x00,                                                    // target value
         ];
 
         let event = BcmAnimateBrightnessEvent::try_from_packet(&packet).unwrap();
@@ -285,13 +290,9 @@ mod tests {
             0xab,                                                    // duration
             0xab,                                                    // duration
             0x01,                                                    // target value
-            0x00,                                                    // target value
-            0x00,                                                    // target value
-            0x00,                                                    // target value
             0x23,                                                    // target value
             0x45,                                                    // target value
             0x67,                                                    // target value
-            0x00,                                                    // target value
         ];
 
         assert_eq!(event.to_packet(), packet);
