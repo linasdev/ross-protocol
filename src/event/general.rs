@@ -3,8 +3,8 @@ use alloc::vec::Vec;
 use core::convert::TryInto;
 
 use crate::convert_packet::{ConvertPacket, ConvertPacketError};
-use crate::event::event_code::*;
 use crate::event::bcm::BcmValue;
+use crate::event::event_code::*;
 use crate::event::relay::RelayValue;
 use crate::event::EventError;
 use crate::packet::Packet;
@@ -137,12 +137,12 @@ impl PeripheralValue {
                 let mut data = vec![0x00];
                 data.append(&mut value.serialize());
                 data
-            },
+            }
             Self::Relay(value) => {
                 let mut data = vec![0x01];
                 data.append(&mut value.serialize());
                 data
-            },
+            }
         }
     }
 
@@ -177,7 +177,8 @@ impl ConvertPacket<PeripheralDataEvent> for PeripheralDataEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != PERIPHERAL_DATA_EVENT_CODE {
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != PERIPHERAL_DATA_EVENT_CODE
+        {
             return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
 
@@ -318,12 +319,12 @@ mod tests {
         packet.data = vec![
             ((PERIPHERAL_DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((PERIPHERAL_DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01,                                  // peripheral address
-            0x23,                                  // peripheral address
-            0x45,                                  // peripheral index
-            0x00,                                  // peripheral value
-            0x00,                                  // peripheral value
-            0xff,                                  // peripheral value
+            0x01,                                             // peripheral address
+            0x23,                                             // peripheral address
+            0x45,                                             // peripheral index
+            0x00,                                             // peripheral value
+            0x00,                                             // peripheral value
+            0xff,                                             // peripheral value
         ];
 
         let event = PeripheralDataEvent::try_from_packet(&packet).unwrap();
@@ -331,7 +332,10 @@ mod tests {
         assert_eq!(event.receiver_address, 0xabab);
         assert_eq!(event.peripheral_address, 0x0123);
         assert_eq!(event.peripheral_index, 0x45);
-        assert_eq!(event.peripheral_value, PeripheralValue::Bcm(BcmValue::Single(0xff)));
+        assert_eq!(
+            event.peripheral_value,
+            PeripheralValue::Bcm(BcmValue::Single(0xff))
+        );
     }
 
     #[test]
@@ -347,12 +351,12 @@ mod tests {
         packet.data = vec![
             ((PERIPHERAL_DATA_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((PERIPHERAL_DATA_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x01,                                  // peripheral address
-            0x23,                                  // peripheral address
-            0x45,                                  // peripheral index
-            0x00,                                  // peripheral value
-            0x00,                                  // peripheral value
-            0xff,                                  // peripheral value
+            0x01,                                             // peripheral address
+            0x23,                                             // peripheral address
+            0x45,                                             // peripheral index
+            0x00,                                             // peripheral value
+            0x00,                                             // peripheral value
+            0xff,                                             // peripheral value
         ];
 
         assert_eq!(event.to_packet(), packet);

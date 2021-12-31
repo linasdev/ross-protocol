@@ -22,8 +22,7 @@ impl ConvertPacket<GatewayDiscoverEvent> for GatewayDiscoverEvent {
             return Err(ConvertPacketError::WrongType);
         }
 
-        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap())
-            != GATEWAY_DISCOVER_EVENT_CODE
+        if u16::from_be_bytes(packet.data[0..=1].try_into().unwrap()) != GATEWAY_DISCOVER_EVENT_CODE
         {
             return Err(ConvertPacketError::Event(EventError::WrongEventType));
         }
@@ -72,8 +71,8 @@ mod tests {
         packet.data = vec![
             ((GATEWAY_DISCOVER_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((GATEWAY_DISCOVER_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x00,                                                   // gateway address
-            0x00,                                                   // gateway address
+            0x00,                                              // gateway address
+            0x00,                                              // gateway address
         ];
 
         let event = GatewayDiscoverEvent::try_from_packet(&packet).unwrap();
@@ -93,8 +92,8 @@ mod tests {
         packet.data = vec![
             ((GATEWAY_DISCOVER_EVENT_CODE >> 8) & 0xff) as u8, // event code
             ((GATEWAY_DISCOVER_EVENT_CODE >> 0) & 0xff) as u8, // event code
-            0x00,                                                   // gateway address
-            0x00,                                                   // gateway address
+            0x00,                                              // gateway address
+            0x00,                                              // gateway address
         ];
 
         assert_eq!(event.to_packet(), packet);
