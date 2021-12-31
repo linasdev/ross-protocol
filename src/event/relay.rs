@@ -14,7 +14,7 @@ pub enum RelayValue {
 }
 
 impl RelayValue {
-    fn serialize(self) -> Vec<u8> {
+    pub(crate) fn serialize(self) -> Vec<u8> {
         match self {
             Self::Single(value) => vec![if value { 0x00 } else { 0x01 }],
             Self::DoubleExclusive(RelayDoubleExclusiveValue::FirstChannelOn) => vec![0x02],
@@ -23,7 +23,7 @@ impl RelayValue {
         }
     }
 
-    fn deserialize(data: &[u8]) -> Result<Self, ConvertPacketError> {
+    pub(crate) fn deserialize(data: &[u8]) -> Result<Self, ConvertPacketError> {
         if data.len() != 1 {
             return Err(ConvertPacketError::WrongSize);
         }

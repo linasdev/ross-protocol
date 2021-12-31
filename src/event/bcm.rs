@@ -15,7 +15,7 @@ pub enum BcmValue {
 }
 
 impl BcmValue {
-    fn serialize(self) -> Vec<u8> {
+    pub(crate) fn serialize(self) -> Vec<u8> {
         match self {
             Self::Single(value) => vec![0x00, value],
             Self::Rgb(red, green, blue) => vec![0x01, red, green, blue],
@@ -23,7 +23,7 @@ impl BcmValue {
         }
     }
 
-    fn deserialize(data: &[u8]) -> Result<Self, ConvertPacketError> {
+    pub(crate) fn deserialize(data: &[u8]) -> Result<Self, ConvertPacketError> {
         if data.len() < 2 {
             return Err(ConvertPacketError::WrongSize);
         }
