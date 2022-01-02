@@ -91,31 +91,28 @@ impl<'a, I: Interface> Protocol<'a, I> {
         &mut self,
         packet: Packet,
         capture_all_addresses: bool,
-        retry_count: u32,
         wait_closure: F,
     ) -> Result<R, ProtocolError> {
-        for _ in 0..retry_count {
-            self.send_packet(&packet)?;
+        self.send_packet(&packet)?;
 
-            wait_closure();
+        wait_closure();
 
-            loop {
-                match self.interface.try_get_packet() {
-                    Ok(received_packet) => {
-                        if capture_all_addresses
-                            || received_packet.device_address == self.device_address
-                            || received_packet.device_address == BROADCAST_ADDRESS
-                        {
-                            if let Ok(received_event) = R::try_from_packet(&received_packet) {
-                                return Ok(received_event);
-                            }
+        loop {
+            match self.interface.try_get_packet() {
+                Ok(received_packet) => {
+                    if capture_all_addresses
+                        || received_packet.device_address == self.device_address
+                        || received_packet.device_address == BROADCAST_ADDRESS
+                    {
+                        if let Ok(received_event) = R::try_from_packet(&received_packet) {
+                            return Ok(received_event);
                         }
                     }
-                    Err(err) => match err {
-                        InterfaceError::NoPacketReceived => break,
-                        _ => return Err(ProtocolError::InterfaceError(err)),
-                    },
                 }
+                Err(err) => match err {
+                    InterfaceError::NoPacketReceived => break,
+                    _ => return Err(ProtocolError::InterfaceError(err)),
+                },
             }
         }
 
@@ -126,33 +123,30 @@ impl<'a, I: Interface> Protocol<'a, I> {
         &mut self,
         packet: Packet,
         capture_all_addresses: bool,
-        retry_count: u32,
         wait_closure: F,
     ) -> Result<Vec<R>, ProtocolError> {
         let mut events = vec![];
 
-        for _ in 0..retry_count {
-            self.send_packet(&packet)?;
+        self.send_packet(&packet)?;
 
-            wait_closure();
+        wait_closure();
 
-            loop {
-                match self.interface.try_get_packet() {
-                    Ok(received_packet) => {
-                        if capture_all_addresses
-                            || received_packet.device_address == self.device_address
-                            || received_packet.device_address == BROADCAST_ADDRESS
-                        {
-                            if let Ok(received_event) = R::try_from_packet(&received_packet) {
-                                events.push(received_event);
-                            }
+        loop {
+            match self.interface.try_get_packet() {
+                Ok(received_packet) => {
+                    if capture_all_addresses
+                        || received_packet.device_address == self.device_address
+                        || received_packet.device_address == BROADCAST_ADDRESS
+                    {
+                        if let Ok(received_event) = R::try_from_packet(&received_packet) {
+                            events.push(received_event);
                         }
                     }
-                    Err(err) => match err {
-                        InterfaceError::NoPacketReceived => break,
-                        _ => return Err(ProtocolError::InterfaceError(err)),
-                    },
                 }
+                Err(err) => match err {
+                    InterfaceError::NoPacketReceived => break,
+                    _ => return Err(ProtocolError::InterfaceError(err)),
+                },
             }
         }
 
