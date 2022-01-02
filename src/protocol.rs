@@ -4,12 +4,8 @@ use alloc::collections::BTreeMap;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::mem::transmute;
-#[cfg(feature = "std")]
-use std::io::ErrorKind;
 
 use crate::convert_packet::ConvertPacket;
-#[cfg(feature = "std")]
-use crate::interface::serial::SerialError;
 use crate::interface::*;
 use crate::packet::Packet;
 
@@ -117,12 +113,6 @@ impl<'a, I: Interface> Protocol<'a, I> {
                     }
                     Err(err) => match err {
                         InterfaceError::NoPacketReceived => break,
-                        #[cfg(feature = "std")]
-                        InterfaceError::SerialError(SerialError::ReadError(err)) => {
-                            if let ErrorKind::TimedOut = err.kind() {
-                                break;
-                            }
-                        }
                         _ => return Err(ProtocolError::InterfaceError(err)),
                     },
                 }
@@ -160,12 +150,6 @@ impl<'a, I: Interface> Protocol<'a, I> {
                     }
                     Err(err) => match err {
                         InterfaceError::NoPacketReceived => break,
-                        #[cfg(feature = "std")]
-                        InterfaceError::SerialError(SerialError::ReadError(err)) => {
-                            if let ErrorKind::TimedOut = err.kind() {
-                                break;
-                            }
-                        }
                         _ => return Err(ProtocolError::InterfaceError(err)),
                     },
                 }
