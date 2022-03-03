@@ -9,6 +9,7 @@ use crate::packet::Packet;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum BcmValue {
+    Binary(bool),
     Single(u8),
     Rgb(u8, u8, u8),
     Rgbw(u8, u8, u8, u8),
@@ -17,9 +18,10 @@ pub enum BcmValue {
 impl BcmValue {
     fn serialize(self) -> Vec<u8> {
         match self {
-            Self::Single(value) => vec![0x00, value],
-            Self::Rgb(red, green, blue) => vec![0x01, red, green, blue],
-            Self::Rgbw(red, green, blue, white) => vec![0x02, red, green, blue, white],
+            Self::Binary(value) => vec![0x00, if value { 0x01 } else { 0x00 }],
+            Self::Single(value) => vec![0x01, value],
+            Self::Rgb(red, green, blue) => vec![0x02, red, green, blue],
+            Self::Rgbw(red, green, blue, white) => vec![0x03, red, green, blue, white],
         }
     }
 
@@ -34,16 +36,23 @@ impl BcmValue {
                     return Err(ConvertPacketError::WrongSize);
                 }
 
-                Ok(Self::Single(data[1]))
+                Ok(Self::Binary(data[1] != 0x00))
             }
             0x01 => {
+                if data.len() != 2 {
+                    return Err(ConvertPacketError::WrongSize);
+                }
+
+                Ok(Self::Single(data[1]))
+            }
+            0x02 => {
                 if data.len() != 4 {
                     return Err(ConvertPacketError::WrongSize);
                 }
 
                 Ok(Self::Rgb(data[1], data[2], data[3]))
             }
-            0x02 => {
+            0x03 => {
                 if data.len() != 5 {
                     return Err(ConvertPacketError::WrongSize);
                 }
