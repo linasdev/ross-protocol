@@ -11,8 +11,8 @@ use crate::packet::Packet;
 pub enum BcmValue {
     Binary(bool),
     Single(u8),
-    Rgb(u8, u8, u8),
-    Rgbw(u8, u8, u8, u8),
+    Rgb(u8, u8, u8, u8),
+    Rgbw(u8, u8, u8, u8, u8),
 }
 
 impl BcmValue {
@@ -20,8 +20,10 @@ impl BcmValue {
         match self {
             Self::Binary(value) => vec![0x00, if value { 0x01 } else { 0x00 }],
             Self::Single(value) => vec![0x01, value],
-            Self::Rgb(red, green, blue) => vec![0x02, red, green, blue],
-            Self::Rgbw(red, green, blue, white) => vec![0x03, red, green, blue, white],
+            Self::Rgb(red, green, blue, brightness) => vec![0x02, red, green, blue, brightness],
+            Self::Rgbw(red, green, blue, white, brightness) => {
+                vec![0x03, red, green, blue, white, brightness]
+            }
         }
     }
 
@@ -46,18 +48,18 @@ impl BcmValue {
                 Ok(Self::Single(data[1]))
             }
             0x02 => {
-                if data.len() != 4 {
-                    return Err(ConvertPacketError::WrongSize);
-                }
-
-                Ok(Self::Rgb(data[1], data[2], data[3]))
-            }
-            0x03 => {
                 if data.len() != 5 {
                     return Err(ConvertPacketError::WrongSize);
                 }
 
-                Ok(Self::Rgbw(data[1], data[2], data[3], data[4]))
+                Ok(Self::Rgb(data[1], data[2], data[3], data[4]))
+            }
+            0x03 => {
+                if data.len() != 6 {
+                    return Err(ConvertPacketError::WrongSize);
+                }
+
+                Ok(Self::Rgbw(data[1], data[2], data[3], data[4], data[5]))
             }
             _ => Err(ConvertPacketError::UnknownEnumVariant),
         }
@@ -213,6 +215,7 @@ mod tests {
             0x23,                                                   // value
             0x45,                                                   // value
             0x67,                                                   // value
+            0x89,                                                   // value
         ];
 
         let event = BcmChangeBrightnessEvent::try_from_packet(&packet).unwrap();
@@ -220,7 +223,7 @@ mod tests {
         assert_eq!(event.bcm_address, 0xabab);
         assert_eq!(event.transmitter_address, 0x0000);
         assert_eq!(event.index, 0x01);
-        assert_eq!(event.value, BcmValue::Rgb(0x23, 0x45, 0x67));
+        assert_eq!(event.value, BcmValue::Rgb(0x23, 0x45, 0x67, 0x89));
     }
 
     #[test]
@@ -229,7 +232,7 @@ mod tests {
             bcm_address: 0xabab,
             transmitter_address: 0x0000,
             index: 0x01,
-            value: BcmValue::Rgb(0x23, 0x45, 0x67),
+            value: BcmValue::Rgb(0x23, 0x45, 0x67, 0x89),
         };
 
         let mut packet = EVENT_PACKET;
@@ -243,6 +246,7 @@ mod tests {
             0x23,                                                   // value
             0x45,                                                   // value
             0x67,                                                   // value
+            0x89,                                                   // value
         ];
 
         assert_eq!(event.to_packet(), packet);
@@ -265,6 +269,7 @@ mod tests {
             0x23,                                                    // target value
             0x45,                                                    // target value
             0x67,                                                    // target value
+            0x89,                                                    // value
         ];
 
         let event = BcmAnimateBrightnessEvent::try_from_packet(&packet).unwrap();
@@ -273,7 +278,7 @@ mod tests {
         assert_eq!(event.transmitter_address, 0x0000);
         assert_eq!(event.index, 0x01);
         assert_eq!(event.duration, 0xabab_abab);
-        assert_eq!(event.target_value, BcmValue::Rgb(0x23, 0x45, 0x67));
+        assert_eq!(event.target_value, BcmValue::Rgb(0x23, 0x45, 0x67, 0x89));
     }
 
     #[test]
@@ -283,7 +288,7 @@ mod tests {
             transmitter_address: 0x0000,
             index: 0x01,
             duration: 0xabab_abab,
-            target_value: BcmValue::Rgb(0x23, 0x45, 0x67),
+            target_value: BcmValue::Rgb(0x23, 0x45, 0x67, 0x89),
         };
 
         let mut packet = EVENT_PACKET;
@@ -301,6 +306,7 @@ mod tests {
             0x23,                                                    // target value
             0x45,                                                    // target value
             0x67,                                                    // target value
+            0x89,                                                    // value
         ];
 
         assert_eq!(event.to_packet(), packet);
