@@ -209,7 +209,7 @@ mod tests {
             0x00,                                                   // transmitter address
             0x00,                                                   // transmitter address
             0x01,                                                   // index
-            0x01,                                                   // value
+            0x02,                                                   // value
             0x23,                                                   // value
             0x45,                                                   // value
             0x67,                                                   // value
@@ -239,7 +239,7 @@ mod tests {
             0x00,                                                   // transmitter address
             0x00,                                                   // transmitter address
             0x01,                                                   // index
-            0x01,                                                   // value
+            0x02,                                                   // value
             0x23,                                                   // value
             0x45,                                                   // value
             0x67,                                                   // value
@@ -261,7 +261,7 @@ mod tests {
             0xab,                                                    // duration
             0xab,                                                    // duration
             0xab,                                                    // duration
-            0x01,                                                    // target value
+            0x02,                                                    // target value
             0x23,                                                    // target value
             0x45,                                                    // target value
             0x67,                                                    // target value
@@ -297,7 +297,7 @@ mod tests {
             0xab,                                                    // duration
             0xab,                                                    // duration
             0xab,                                                    // duration
-            0x01,                                                    // target value
+            0x02,                                                    // target value
             0x23,                                                    // target value
             0x45,                                                    // target value
             0x67,                                                    // target value
