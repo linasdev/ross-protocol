@@ -21,6 +21,9 @@ pub enum ProtocolError {
 pub struct Protocol<'a, I: Interface> {
     device_address: u16,
     interface: I,
+    #[cfg(not(feature = "send"))]
+    handlers: BTreeMap<u32, (Box<dyn FnMut(&Packet, &mut Self) + 'a>, bool)>,
+    #[cfg(feature = "send")]
     handlers: BTreeMap<u32, (Box<dyn FnMut(&Packet, &mut Self) + Send + 'a>, bool)>,
 }
 
@@ -70,6 +73,9 @@ impl<'a, I: Interface> Protocol<'a, I> {
 
     pub fn add_packet_handler<'s>(
         &'s mut self,
+        #[cfg(not(feature = "send"))]
+        handler: Box<dyn FnMut(&Packet, &mut Self) + 'a>,
+        #[cfg(feature = "send")]
         handler: Box<dyn FnMut(&Packet, &mut Self) + Send + 'a>,
         capture_all_addresses: bool,
     ) -> Result<u32, ProtocolError> {
