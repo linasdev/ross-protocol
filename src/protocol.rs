@@ -21,7 +21,7 @@ pub enum ProtocolError {
 pub struct Protocol<'a, I: Interface> {
     device_address: u16,
     interface: I,
-    handlers: BTreeMap<u32, (Box<dyn FnMut(&Packet, &mut Self) + 'a>, bool)>,
+    handlers: BTreeMap<u32, (Box<dyn FnMut(&Packet, &mut Self) + Send + 'a>, bool)>,
 }
 
 impl<'a, I: Interface> Protocol<'a, I> {
@@ -70,7 +70,7 @@ impl<'a, I: Interface> Protocol<'a, I> {
 
     pub fn add_packet_handler<'s>(
         &'s mut self,
-        handler: Box<dyn FnMut(&Packet, &mut Self) + 'a>,
+        handler: Box<dyn FnMut(&Packet, &mut Self) + Send + 'a>,
         capture_all_addresses: bool,
     ) -> Result<u32, ProtocolError> {
         let id = self.get_next_handler_id();
